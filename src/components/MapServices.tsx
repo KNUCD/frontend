@@ -1,14 +1,19 @@
+import { useRouter } from 'next/router';
 import { RefObject, Ref } from 'react';
 import { geolocationAtom, realTimeAtom } from 'others/stateStore';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { defaultPos } from 'constants/default';
+import { Path } from 'others/IntegrateInterface';
 
 interface MapServicesProps {
   mapRef: RefObject<kakao.maps.Map>;
+  path: Path;
+  setPosData?: Function;
 }
 
-const MapServices: React.FC<MapServicesProps> = ({ mapRef }) => {
+const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData }) => {
+  const router = useRouter();
   const myPos = useRecoilValue(geolocationAtom);
   const [realTimeData, setRealTimeData] = useRecoilState(realTimeAtom);
   const { isRealTime, fixedPos } = realTimeData;
@@ -39,7 +44,17 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef }) => {
           lng: map?.getCenter().getLng() ?? defaultPos.lng,
         },
       });
+      router.push('/writing');
     }
+  };
+
+  const handleWritingNextStep = () => {
+    if (!setPosData) return;
+    const map = mapRef.current;
+    setPosData({
+      lat: map?.getCenter().getLat(),
+      lng: map?.getCenter().getLng(),
+    });
   };
 
   return (
@@ -48,9 +63,16 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef }) => {
         className={`realTimeBtn ${isRealTime ? 'realTime' : 'nonRealTime'}`}
         onClick={handleRealTimeValue}
       ></button>
-      <button className={'complain'} onClick={directToWritingPage}>
-        민원 넣기
-      </button>
+      {path === 'home' && (
+        <button className={'complain'} onClick={directToWritingPage}>
+          민원 넣기
+        </button>
+      )}
+      {path === 'writing' && (
+        <button className={'complainPosBtn'} onClick={handleWritingNextStep}>
+          이 위치에 민원 넣기
+        </button>
+      )}
     </StyledMapServices>
   );
 };
@@ -86,6 +108,17 @@ const StyledMapServices = styled.div`
     right: 90px;
     width: 50px;
     height: 50px;
+  }
+  & .complainPosBtn {
+    position: fixed;
+    bottom: 40px;
+    left: calc(50% - 200px);
+    width: 400px;
+    height: 40px;
+    background: #ffd800;
+    outline: none;
+    border: none;
+    z-index: 2;
   }
 `;
 

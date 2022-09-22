@@ -4,8 +4,16 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { geolocationAtom, realTimeAtom } from 'others/stateStore';
 import { pin } from 'constants/pin';
 import MapServices from './MapServices';
+import { Path } from 'others/IntegrateInterface';
 
-const MyMap: React.FC = () => {
+interface MyMapProps {
+  props: {
+    path: Path;
+    setPosData?: Function;
+  };
+}
+
+const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const myPos = useRecoilValue(geolocationAtom);
   const mapRef = useRef<kakao.maps.Map>(null);
@@ -38,13 +46,17 @@ const MyMap: React.FC = () => {
               }
             }}
           >
-            <MarkerClusterer>
-              {pin.positions.map((pos, index) => {
-                return <MapMarker key={index} position={pos} />;
-              })}
-            </MarkerClusterer>
+            {path === 'home' ? (
+              <MarkerClusterer>
+                {pin.positions.map((pos, index) => {
+                  return <MapMarker key={index} position={pos} />;
+                })}
+              </MarkerClusterer>
+            ) : (
+              <></>
+            )}
           </Map>
-          <MapServices mapRef={mapRef}></MapServices>
+          <MapServices mapRef={mapRef} path={path} setPosData={setPosData}></MapServices>
         </>
       ) : (
         <></>

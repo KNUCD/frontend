@@ -8,7 +8,11 @@ const HomePage: React.FC = () => {
     <StyledPage>
       {/* <ComplainDetail /> */}
       {/* <ComplainList /> */}
-      <MyMap />
+      <MyMap
+        props={{
+          path: 'home',
+        }}
+      />
     </StyledPage>
   );
 };
