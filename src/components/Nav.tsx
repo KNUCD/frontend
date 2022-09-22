@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Nav = () => {
+const Nav: React.FC = () => {
   return (
     <StyledNav>
       <div></div>

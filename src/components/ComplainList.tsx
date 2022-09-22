@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import Complain from './Complain';
 
-const ComplainList = () => {
+const ComplainList: React.FC = () => {
   return (
     <StyledComplainList>
       <ComplainListHeader>

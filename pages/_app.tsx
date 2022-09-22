@@ -4,7 +4,7 @@ import Script from 'next/script';
 import { RecoilRoot } from 'recoil';
 import Checker from 'components/Checker';
 import Nav from 'components/Nav';
-import { Head } from 'next/document';
+import Head from 'next/head';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

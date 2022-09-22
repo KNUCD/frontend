@@ -7,7 +7,7 @@ const HomePage: React.FC = () => {
   return (
     <StyledPage>
       {/* <ComplainDetail /> */}
-      <ComplainList />
+      {/* <ComplainList /> */}
       <MyMap />
     </StyledPage>
   );

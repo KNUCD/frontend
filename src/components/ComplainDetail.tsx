@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const ComplainDetail = () => {
+const ComplainDetail: React.FC = () => {
   const comments = [
     {
       name: '곽나영',
