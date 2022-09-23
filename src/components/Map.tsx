@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, SetStateAction, Dispatch } from 'react';
 import { Map, MarkerClusterer, MapMarker } from 'react-kakao-maps-sdk';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { geolocationAtom, realTimeAtom } from 'others/stateStore';
@@ -10,7 +10,12 @@ import myAxios from 'others/myAxios';
 interface MyMapProps {
   props: {
     path: Path;
-    setPosData?: Function;
+    setPosData?: Dispatch<
+      SetStateAction<{
+        lat: number;
+        lng: number;
+      } | null>
+    >;
   };
 }
 
