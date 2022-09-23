@@ -9,4 +9,15 @@ const geolocationAtom = atom({
   },
 });
 
-export { geolocationAtom };
+const realTimeAtom = atom({
+  key: 'realTime',
+  default: {
+    isRealTime: true,
+    fixedPos: {
+      lat: defaultPos.lat,
+      lng: defaultPos.lng,
+    },
+  },
+});
+
+export { geolocationAtom, realTimeAtom };

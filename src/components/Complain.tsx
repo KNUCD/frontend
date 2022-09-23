@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Complain = () => {
+const Complain: React.FC = () => {
   return (
     <StyledComplain>
       <div className={'content'}>
