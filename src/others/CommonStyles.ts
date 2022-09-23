@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const StyledPage = styled.div`
   display: flex;
-  margin-left: 90px;
-  width: calc(100% - 90px);
+  margin-left: 70px;
+  width: calc(100% - 70px);
   height: 100%;
 `;

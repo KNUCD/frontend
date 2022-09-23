@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Map, MarkerClusterer, MapMarker } from 'react-kakao-maps-sdk';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { geolocationAtom, realTimeAtom } from 'others/stateStore';
-import { pin } from 'constants/pin';
 import MapServices from './MapServices';
 import { Path } from 'others/IntegrateInterfaces';
+import useInterval from 'use-interval';
+import myAxios from 'others/myAxios';
 
 interface MyMapProps {
   props: {
@@ -13,7 +14,14 @@ interface MyMapProps {
   };
 }
 
+interface Pin {
+  id: number;
+  lat: number;
+  lng: number;
+}
+
 const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
+  const [pin, setPin] = useState<Pin[]>([]);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const myPos = useRecoilValue(geolocationAtom);
   const mapRef = useRef<kakao.maps.Map>(null);
@@ -40,11 +48,19 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
     const markerPos = _target.getPosition();
   };
 
+  const handleRefreshPin = async () => {
+    // const res = await myAxios('get', '');
+  };
+
   useEffect(() => {
     window.kakao.maps.load(() => {
       setIsMapLoaded(true);
     });
   }, []);
+
+  useInterval(() => {
+    handleRefreshPin();
+  }, 3000);
 
   return (
     <>
@@ -86,7 +102,7 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
                   },
                 ]}
               >
-                {pin.positions.map((pos, index) => {
+                {pin.map((pos, index) => {
                   return (
                     <MapMarker
                       key={index}
