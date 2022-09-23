@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { RefObject, Ref } from 'react';
+import { RefObject, Ref, Dispatch, SetStateAction } from 'react';
 import { geolocationAtom, realTimeAtom } from 'others/stateStore';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
@@ -9,7 +9,12 @@ import { Path } from 'others/IntegrateInterfaces';
 interface MapServicesProps {
   mapRef: RefObject<kakao.maps.Map>;
   path: Path;
-  setPosData?: Function;
+  setPosData?: Dispatch<
+    SetStateAction<{
+      lat: number;
+      lng: number;
+    } | null>
+  >;
 }
 
 const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData }) => {
@@ -44,16 +49,16 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData }) =
           lng: map?.getCenter().getLng() ?? defaultPos.lng,
         },
       });
-      router.push('/writing');
     }
+    router.push('/writing');
   };
 
   const handleWritingNextStep = () => {
     if (!setPosData) return;
     const map = mapRef.current;
     setPosData({
-      lat: map?.getCenter().getLat(),
-      lng: map?.getCenter().getLng(),
+      lat: map?.getCenter().getLat() ?? defaultPos.lat,
+      lng: map?.getCenter().getLng() ?? defaultPos.lng,
     });
   };
 
@@ -63,7 +68,7 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData }) =
         className={`realTimeBtn ${isRealTime ? 'realTime' : 'nonRealTime'}`}
         onClick={handleRealTimeValue}
       ></button>
-      {path === 'home' && (
+      {path === 'map' && (
         <button className={'complain'} onClick={directToWritingPage}>
           민원 넣기
         </button>

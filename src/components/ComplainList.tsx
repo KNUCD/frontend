@@ -5,10 +5,31 @@ import Magnify from '/public/magnify.svg';
 import Life from '/public/life.svg';
 import Security from '/public/security.svg';
 import Traffic from '/public/traffic.svg';
+import GoBack from '/public/goBack.svg';
+import GoFront from '/public/goFront.svg';
+import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { closeAtom } from 'others/stateStore';
 
 const ComplainList: React.FC = () => {
+  const [closeData, setCloseData] = useRecoilState(closeAtom);
+  const { isClosed } = closeData;
+
+  const handleClose = () => {
+    const tempData = { ...closeData };
+    tempData.isClosed = !closeData.isClosed;
+    setCloseData(tempData);
+  };
+
+  useEffect(() => {
+    const tempData = { ...closeData };
+    tempData.isMapPage = true;
+    tempData.isList = true;
+    setCloseData(tempData);
+  }, []);
+
   return (
-    <StyledComplainList>
+    <StyledComplainList isClosed={isClosed}>
       <ComplainListHeader>
         <div className={'upper'}>
           <p>민원 꾸러미</p>
@@ -48,17 +69,51 @@ const ComplainList: React.FC = () => {
         <Complain></Complain>
         <Complain></Complain>
       </Complains>
+      <div className={'close'} onClick={handleClose}>
+        {isClosed ? <GoFront /> : <GoBack />}
+      </div>
     </StyledComplainList>
   );
 };
 
-const StyledComplainList = styled.div`
+const Complains = styled.div`
   display: flex;
+  flex-direction: column;
+  overflow: scroll;
+  gap: 6px;
+  background: #f2f2f2;
+`;
+
+interface StyledComplainListProps {
+  isClosed: boolean;
+}
+
+const StyledComplainList = styled.div<StyledComplainListProps>`
+  display: flex;
+  position: relative;
   flex-direction: column;
   min-width: 517px;
   width: 517px;
   height: 100%;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
   z-index: 2;
+  transform: ${(props) => (props.isClosed ? 'translateX(-100%)' : 'translateX(0)')};
+  transition: 1s;
+  & .close {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: calc(50% - 30px);
+    right: -20px;
+    width: 20px;
+    height: 60px;
+    background: #fff;
+    border-radius: 0px 3px 3px 0px;
+    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+    z-index: -1;
+    cursor: pointer;
+  }
 `;
 
 const ComplainListHeader = styled.div`
@@ -78,6 +133,7 @@ const ComplainListHeader = styled.div`
     }
     & > div {
       display: flex;
+      cursor: pointer;
     }
   }
 
@@ -119,6 +175,7 @@ const ComplainListHeader = styled.div`
       border: none;
       border-radius: 3px;
       padding-left: 15px;
+      cursor: pointer;
       & > div {
         display: flex;
         justify-content: center;
@@ -142,13 +199,6 @@ const ComplainListHeader = styled.div`
       background: #662d91;
     }
   }
-`;
-
-const Complains = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 0 28px;
 `;
 
 export default ComplainList;

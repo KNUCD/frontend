@@ -72,6 +72,7 @@ interface StyledBarProps {
 const StyledLink = styled.a``;
 
 const StyledBar = styled.div<StyledBarProps>`
+  display: ${(props) => (props.fill === ACTIVE ? '' : 'none')};
   position: absolute;
   right: 0;
   width: 3px;
@@ -89,7 +90,7 @@ const StyledNav = styled.div`
   width: 70px;
   height: 100%;
   background: #fff;
-  z-index: 2;
+  z-index: 3;
   border-right: 1px solid #e0e0e0;
 
   & > div,
