@@ -1,6 +1,7 @@
 import { StyledPage } from '../../others/CommonStyles';
 import Image from 'next/future/image';
 import main from '../../../public/main.png';
+import main2 from '../../../public/main2.png';
 import styled from 'styled-components';
 import Pencil from '/public/pencil.svg';
 import Link from 'next/link';
@@ -37,7 +38,12 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      <Main src={main} />
+      <div className={'pad'}>
+        <Main src={main2} />
+      </div>
+      <div className={'pc'}>
+        <Main src={main} />
+      </div>
     </StyledHomePage>
   );
 };
@@ -49,7 +55,7 @@ const StyledHomePage = styled(StyledPage)`
     display: flex;
     position: absolute;
     flex-direction: column;
-    padding: 70px 120px;
+    z-index: 1;
     & > h3 {
       font-style: bold;
       font-size: 27px;
@@ -61,6 +67,7 @@ const StyledHomePage = styled(StyledPage)`
       font-size: 84px;
       color: #333;
       margin-bottom: 50px;
+      white-space: nowrap;
     }
     & > p {
       font-style: bold;
@@ -100,6 +107,30 @@ const StyledHomePage = styled(StyledPage)`
         font-size: 18px;
         background: #fff;
       }
+    }
+  }
+  & .pad,
+  .pc {
+    width: 100%;
+    padding: 0;
+    height: 100vh;
+    z-index: 0;
+  }
+
+  @media (min-width: 1500px) {
+    & > div {
+      padding: 140px 130px;
+    }
+    & .pad {
+      display: none;
+    }
+  }
+  @media (max-width: 1499px) {
+    & > div {
+      padding: 70px 120px;
+    }
+    & .pc {
+      display: none;
     }
   }
 `;

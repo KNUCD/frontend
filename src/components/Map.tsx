@@ -7,6 +7,7 @@ import { Category, Path } from 'others/IntegrateInterfaces';
 import useInterval from 'use-interval';
 import myAxios from 'others/myAxios';
 import styled from 'styled-components';
+import Pin from '/public/pin.svg';
 
 interface MyMapProps {
   props: {
@@ -137,7 +138,7 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
                           },
                         }}
                         onClick={onMarkerClick}
-                      />
+                      ></MapMarker>
                     );
                   })}
                 </MarkerClusterer>
