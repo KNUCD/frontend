@@ -3,7 +3,7 @@ import { Map, MarkerClusterer, MapMarker } from 'react-kakao-maps-sdk';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { closeAtom, geolocationAtom, realTimeAtom } from 'others/stateStore';
 import MapServices from './MapServices';
-import { Category, Path } from 'others/IntegrateInterfaces';
+import { Category, Obj, Path } from 'others/IntegrateInterfaces';
 import useInterval from 'use-interval';
 import myAxios from 'others/myAxios';
 import styled from 'styled-components';
@@ -25,6 +25,7 @@ interface Pin {
   id: number;
   latitude: number;
   longitude: number;
+  category: Category;
 }
 
 const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
@@ -111,11 +112,11 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
                   calculator={[]}
                   styles={[
                     {
-                      width: '30px',
-                      height: '30px',
-                      background: '#ffd800',
-                      borderRadius: '15px',
-                      color: '#000',
+                      width: '32px',
+                      height: '40px',
+                      background: 'url("/cluster.svg")',
+                      paddingTop: '3px',
+                      color: '#fff',
                       textAlign: 'center',
                       fontWeight: 'bold',
                       lineHeight: '31px',
@@ -131,10 +132,10 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
                           lng: pin.longitude,
                         }}
                         image={{
-                          src: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+                          src: svgNameByCategory[pin.category],
                           size: {
-                            width: 44,
-                            height: 49,
+                            width: 32,
+                            height: 40,
                           },
                         }}
                         onClick={onMarkerClick}
@@ -155,6 +156,12 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
 interface StyledMapProps {
   transform: string;
 }
+
+const svgNameByCategory: Obj<string> = {
+  LIFE: '/lifePin.svg',
+  SECURITY: '/securityPin.svg',
+  TRAFFIC: '/trafficPin.svg',
+};
 
 const StyledMap = styled.div<StyledMapProps>`
   position: absolute;
