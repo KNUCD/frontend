@@ -49,8 +49,8 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData }) =
           lng: map?.getCenter().getLng() ?? defaultPos.lng,
         },
       });
-      router.push('/writing');
     }
+    router.push('/writing');
   };
 
   const handleWritingNextStep = () => {
@@ -68,7 +68,7 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData }) =
         className={`realTimeBtn ${isRealTime ? 'realTime' : 'nonRealTime'}`}
         onClick={handleRealTimeValue}
       ></button>
-      {path === 'home' && (
+      {path === 'map' && (
         <button className={'complain'} onClick={directToWritingPage}>
           민원 넣기
         </button>

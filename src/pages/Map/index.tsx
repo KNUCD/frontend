@@ -15,7 +15,7 @@ const MapPage: React.FC = () => {
       {isList && <ComplainList />}
       <MyMap
         props={{
-          path: 'home',
+          path: 'map',
         }}
       />
     </StyledPage>

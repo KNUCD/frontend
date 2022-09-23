@@ -3,7 +3,7 @@ import { Map, MarkerClusterer, MapMarker } from 'react-kakao-maps-sdk';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { closeAtom, geolocationAtom, realTimeAtom } from 'others/stateStore';
 import MapServices from './MapServices';
-import { Path } from 'others/IntegrateInterfaces';
+import { Category, Path } from 'others/IntegrateInterfaces';
 import useInterval from 'use-interval';
 import myAxios from 'others/myAxios';
 import styled from 'styled-components';
@@ -22,18 +22,19 @@ interface MyMapProps {
 
 interface Pin {
   id: number;
-  lat: number;
-  lng: number;
+  latitude: number;
+  longitude: number;
 }
 
 const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
-  const [pin, setPin] = useState<Pin[]>([]);
+  const [pins, setPins] = useState<Pin[]>([]);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const myPos = useRecoilValue(geolocationAtom);
   const mapRef = useRef<kakao.maps.Map>(null);
   const [realTimeData, setRealTimeData] = useRecoilState(realTimeAtom);
   const { isRealTime, fixedPos } = realTimeData;
   const [closeData, setCloseData] = useRecoilState(closeAtom);
+  const [category, setCategory] = useState<Category>('ALL');
 
   const onClusterClick = (_target: kakao.maps.MarkerClusterer, cluster: kakao.maps.Cluster) => {
     const map = mapRef.current;
@@ -56,7 +57,8 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
   };
 
   const handleRefreshPin = async () => {
-    // const res = await myAxios('get', '');
+    const res = await myAxios('get', `api/v1/complaint/pin?category=${category}`);
+    setPins(res.data.response);
   };
 
   const handleTransform = () => {
@@ -71,11 +73,12 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
     window.kakao.maps.load(() => {
       setIsMapLoaded(true);
     });
+    handleRefreshPin();
   }, []);
 
   useInterval(() => {
     handleRefreshPin();
-  }, 3000);
+  }, 10000);
 
   return (
     <>
@@ -99,7 +102,7 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
                 }
               }}
             >
-              {path === 'home' && (
+              {path === 'map' && (
                 <MarkerClusterer
                   averageCenter={true}
                   disableClickZoom={true}
@@ -118,11 +121,14 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
                     },
                   ]}
                 >
-                  {pin.map((pos, index) => {
+                  {pins.map((pin, index) => {
                     return (
                       <MapMarker
                         key={index}
-                        position={pos}
+                        position={{
+                          lat: pin.latitude,
+                          lng: pin.longitude,
+                        }}
                         image={{
                           src: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
                           size: {

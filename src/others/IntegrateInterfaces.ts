@@ -1,4 +1,4 @@
-export type Path = 'home' | 'writing';
+export type Path = 'home' | 'map' | 'writing';
 
 export type Category = 'ALL' | 'LIFE' | 'SECURITY' | 'TRAFFIC';
 
