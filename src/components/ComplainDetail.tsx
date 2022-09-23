@@ -1,6 +1,13 @@
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import GoBack from '/public/goBack.svg';
+import GoFront from '/public/goFront.svg';
+import { useRecoilState } from 'recoil';
+import { closeAtom } from 'others/stateStore';
 
 const ComplainDetail: React.FC = () => {
+  const [closeData, setCloseData] = useRecoilState(closeAtom);
+  const { isClosed } = closeData;
   const comments = [
     {
       name: '곽나영',
@@ -16,8 +23,21 @@ const ComplainDetail: React.FC = () => {
     },
   ];
 
+  const handleClose = () => {
+    const tempData = { ...closeData };
+    tempData.isClosed = !closeData.isClosed;
+    setCloseData(tempData);
+  };
+
+  useEffect(() => {
+    const tempData = { ...closeData };
+    tempData.isMapPage = true;
+    tempData.isList = false;
+    setCloseData(tempData);
+  }, []);
+
   return (
-    <StyledComplainDetail>
+    <StyledComplainDetail isClosed={isClosed}>
       <div className={'header'}>
         <div></div>
         <div></div>
@@ -63,20 +83,29 @@ const ComplainDetail: React.FC = () => {
         <div className={'input'}></div>
         <div className={'emotion'}></div>
       </div>
+      <div className={'close'} onClick={handleClose}>
+        {isClosed ? <GoFront /> : <GoBack />}
+      </div>
     </StyledComplainDetail>
   );
 };
 
-const StyledComplainDetail = styled.div`
+interface StyledComplainDetailProps {
+  isClosed: boolean;
+}
+
+const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
   display: flex;
   flex-direction: column;
   position: relative;
   width: 463px;
   min-width: 463px;
   height: 100%;
-  overflow: scroll;
-  overflow-x: hidden;
   background: #fff;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+  z-index: 2;
+  transform: ${(props) => (props.isClosed ? 'translateX(-100%)' : 'translateX(0)')};
+  transition: 1s;
   & > .header {
     display: flex;
     justify-content: space-between;
@@ -178,6 +207,21 @@ const StyledComplainDetail = styled.div`
       height: 45px;
       background: #ccc;
     }
+  }
+  & .close {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: calc(50% - 30px);
+    right: -20px;
+    width: 20px;
+    height: 60px;
+    background: #fff;
+    border-radius: 0px 3px 3px 0px;
+    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+    z-index: 3;
+    cursor: pointer;
   }
 `;
 

@@ -20,4 +20,13 @@ const realTimeAtom = atom({
   },
 });
 
-export { geolocationAtom, realTimeAtom };
+const closeAtom = atom({
+  key: 'close',
+  default: {
+    isMapPage: false,
+    isClosed: false,
+    isList: true,
+  },
+});
+
+export { geolocationAtom, realTimeAtom, closeAtom };

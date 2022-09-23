@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, SetStateAction, Dispatch } from 'react';
 import { Map, MarkerClusterer, MapMarker } from 'react-kakao-maps-sdk';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { geolocationAtom, realTimeAtom } from 'others/stateStore';
+import { closeAtom, geolocationAtom, realTimeAtom } from 'others/stateStore';
 import MapServices from './MapServices';
 import { Path } from 'others/IntegrateInterfaces';
 import useInterval from 'use-interval';
 import myAxios from 'others/myAxios';
+import styled from 'styled-components';
 
 interface MyMapProps {
   props: {
@@ -32,6 +33,7 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
   const mapRef = useRef<kakao.maps.Map>(null);
   const [realTimeData, setRealTimeData] = useRecoilState(realTimeAtom);
   const { isRealTime, fixedPos } = realTimeData;
+  const [closeData, setCloseData] = useRecoilState(closeAtom);
 
   const onClusterClick = (_target: kakao.maps.MarkerClusterer, cluster: kakao.maps.Cluster) => {
     const map = mapRef.current;
@@ -57,6 +59,14 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
     // const res = await myAxios('get', '');
   };
 
+  const handleTransform = () => {
+    const { isMapPage, isClosed, isList } = closeData;
+    if (!isMapPage) return '0';
+    if (isClosed) return '0';
+    if (isList) return '258px';
+    return '231px';
+  };
+
   useEffect(() => {
     window.kakao.maps.load(() => {
       setIsMapLoaded(true);
@@ -71,66 +81,81 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
     <>
       {isMapLoaded && (
         <>
-          <Map
-            center={isRealTime ? myPos : fixedPos}
-            style={{
-              width: '100%',
-              height: '100%',
-            }}
-            level={3}
-            ref={mapRef}
-            onCenterChanged={() => {
-              if (isRealTime) {
-                setRealTimeData({
-                  isRealTime: false,
-                  fixedPos: myPos,
-                });
-              }
-            }}
-          >
-            {path === 'home' && (
-              <MarkerClusterer
-                averageCenter={true}
-                disableClickZoom={true}
-                onClusterclick={onClusterClick}
-                calculator={[]}
-                styles={[
-                  {
-                    width: '30px',
-                    height: '30px',
-                    background: '#ffd800',
-                    borderRadius: '15px',
-                    color: '#000',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    lineHeight: '31px',
-                  },
-                ]}
-              >
-                {pin.map((pos, index) => {
-                  return (
-                    <MapMarker
-                      key={index}
-                      position={pos}
-                      image={{
-                        src: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
-                        size: {
-                          width: 44,
-                          height: 49,
-                        },
-                      }}
-                      onClick={onMarkerClick}
-                    />
-                  );
-                })}
-              </MarkerClusterer>
-            )}
-          </Map>
+          <StyledMap transform={handleTransform()}>
+            <Map
+              center={isRealTime ? myPos : fixedPos}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              level={3}
+              ref={mapRef}
+              onCenterChanged={() => {
+                if (isRealTime) {
+                  setRealTimeData({
+                    isRealTime: false,
+                    fixedPos: myPos,
+                  });
+                }
+              }}
+            >
+              {path === 'home' && (
+                <MarkerClusterer
+                  averageCenter={true}
+                  disableClickZoom={true}
+                  onClusterclick={onClusterClick}
+                  calculator={[]}
+                  styles={[
+                    {
+                      width: '30px',
+                      height: '30px',
+                      background: '#ffd800',
+                      borderRadius: '15px',
+                      color: '#000',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      lineHeight: '31px',
+                    },
+                  ]}
+                >
+                  {pin.map((pos, index) => {
+                    return (
+                      <MapMarker
+                        key={index}
+                        position={pos}
+                        image={{
+                          src: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+                          size: {
+                            width: 44,
+                            height: 49,
+                          },
+                        }}
+                        onClick={onMarkerClick}
+                      />
+                    );
+                  })}
+                </MarkerClusterer>
+              )}
+            </Map>
+          </StyledMap>
           <MapServices mapRef={mapRef} path={path} setPosData={setPosData}></MapServices>
         </>
       )}
     </>
   );
 };
+
+interface StyledMapProps {
+  transform: string;
+}
+
+const StyledMap = styled.div<StyledMapProps>`
+  position: absolute;
+  top: 0;
+  left: ${(props) => props.transform};
+  width: 100vw;
+  height: 100vh;
+  transition: 1s;
+`;
 
 export default MyMap;
