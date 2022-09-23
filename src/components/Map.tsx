@@ -4,7 +4,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { geolocationAtom, realTimeAtom } from 'others/stateStore';
 import { pin } from 'constants/pin';
 import MapServices from './MapServices';
-import { Path } from 'others/IntegrateInterface';
+import { Path } from 'others/IntegrateInterfaces';
 
 interface MyMapProps {
   props: {

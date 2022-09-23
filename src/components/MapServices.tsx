@@ -4,7 +4,7 @@ import { geolocationAtom, realTimeAtom } from 'others/stateStore';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { defaultPos } from 'constants/default';
-import { Path } from 'others/IntegrateInterface';
+import { Path } from 'others/IntegrateInterfaces';
 
 interface MapServicesProps {
   mapRef: RefObject<kakao.maps.Map>;
