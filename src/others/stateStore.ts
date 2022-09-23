@@ -1,4 +1,4 @@
-import { defaultPos } from 'constants/default';
+import { defaultPos } from '../constants/default';
 import { atom } from 'recoil';
 
 const geolocationAtom = atom({

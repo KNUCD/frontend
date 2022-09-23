@@ -18,6 +18,8 @@ interface MyMapProps {
         lng: number;
       } | null>
     >;
+    setChoicedPin?: Dispatch<SetStateAction<Category | null>>;
+    choicedPin: Category | null;
   };
 }
 
@@ -28,7 +30,7 @@ interface Pin {
   category: Category;
 }
 
-const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
+const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData, setChoicedPin, choicedPin } }) => {
   const [pins, setPins] = useState<Pin[]>([]);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const myPos = useRecoilValue(geolocationAtom);
@@ -146,7 +148,13 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData } }) => {
               )}
             </Map>
           </StyledMap>
-          <MapServices mapRef={mapRef} path={path} setPosData={setPosData}></MapServices>
+          <MapServices
+            mapRef={mapRef}
+            path={path}
+            setPosData={setPosData}
+            setChoicedPin={setChoicedPin}
+            choicedPin={choicedPin}
+          ></MapServices>
         </>
       )}
     </>
