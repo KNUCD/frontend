@@ -17,9 +17,10 @@ import Share from '/public/share.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { accessTokenAtom, closeAtom, detailAtom, isReadyAtom } from 'others/stateStore';
 import myAxios from 'others/myAxios';
-import { colorByCategory, getDayOfWeek } from 'constants/default';
+import { colorByCategory, getDayOfWeek, loginURL } from 'constants/default';
 import { Category, Emotion } from 'others/IntegrateInterfaces';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 interface detailDataProps {
   category: Category;
@@ -45,6 +46,7 @@ const ComplainDetail: React.FC = () => {
   const [myEmotion, setMyEmotion] = useState<Emotion | null>(null);
   const accessToken = useRecoilValue(accessTokenAtom);
   const [isEmotionBoxOpen, setIsEmotionBoxOpen] = useState(false);
+  const router = useRouter();
 
   const comments = [
     {
@@ -92,6 +94,11 @@ const ComplainDetail: React.FC = () => {
   };
 
   const handleEmotionSubmit = async (emotion: Emotion) => {
+    if (accessToken === '') {
+      router.push(loginURL);
+      return;
+    }
+
     const body = {
       complaintId: id,
       type: emotion,
