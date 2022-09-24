@@ -11,8 +11,8 @@ import { colorByCategory } from 'constants/default';
 import Life from '/public/life.svg';
 import Security from '/public/security.svg';
 import Traffic from '/public/traffic.svg';
-import { useRecoilState } from 'recoil';
-import { closeAtom } from 'others/stateStore';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { accessTokenAtom, closeAtom } from 'others/stateStore';
 
 const WritingPage: React.FC = () => {
   const [disabled, setDisabled] = useState(false);
@@ -24,6 +24,7 @@ const WritingPage: React.FC = () => {
     lng: number;
   } | null>(null);
   const router = useRouter();
+  const accessToken = useRecoilValue(accessTokenAtom);
 
   const handleWriting = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,7 +39,8 @@ const WritingPage: React.FC = () => {
       category: choicedPin,
       file: img.size === 0 ? undefined : data.get('img'),
     };
-    const res = await myAxios('post', 'api/v1/complaint', body, undefined, undefined, 'multipart/form-data');
+    console.log(accessToken);
+    const res = await myAxios('post', 'api/v1/complaint', body, true, accessToken, 'multipart/form-data');
     const tempData = { ...closeData };
     tempData.isMapPage = true;
     setCloseData(tempData);

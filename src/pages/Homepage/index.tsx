@@ -5,16 +5,28 @@ import main2 from '../../../public/main2.png';
 import styled from 'styled-components';
 import Pencil from '/public/pencil.svg';
 import Link from 'next/link';
-import { useRecoilState } from 'recoil';
-import { closeAtom } from 'others/stateStore';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { accessTokenAtom, closeAtom } from 'others/stateStore';
+import { useRouter } from 'next/router';
+import { loginURL } from 'constants/default';
 
 const HomePage: React.FC = () => {
   const [closeData, setCloseData] = useRecoilState(closeAtom);
+  const router = useRouter();
+  const accessToken = useRecoilValue(accessTokenAtom);
 
   const handleCloseData = () => {
     const tempData = { ...closeData };
     tempData.isMapPage = false;
     setCloseData(tempData);
+  };
+
+  const handleLogin = () => {
+    router.push(loginURL);
+  };
+
+  const handleRedirectToMap = () => {
+    router.push('/map');
   };
 
   return (
@@ -42,9 +54,15 @@ const HomePage: React.FC = () => {
               <p>민원 작성하기</p>
             </StyledLink>
           </Link>
-          <Link href={'/sign'} passHref>
-            <StyledLink className={'login'}>로그인</StyledLink>
-          </Link>
+          {accessToken === '' ? (
+            <button className={'redirect'} onClick={handleLogin}>
+              로그인
+            </button>
+          ) : (
+            <button className={'redirect'} onClick={handleRedirectToMap}>
+              지도로 가기
+            </button>
+          )}
         </div>
       </div>
 
@@ -108,7 +126,7 @@ const StyledHomePage = styled(StyledPage)`
           font-size: 18px;
         }
       }
-      & .login {
+      & .redirect {
         filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.25));
         width: 150px;
         height: 58px;
@@ -116,6 +134,10 @@ const StyledHomePage = styled(StyledPage)`
         font-weight: 700;
         font-size: 18px;
         background: #fff;
+        border: none;
+        outline: none;
+        border-radius: 5px;
+        cursor: pointer;
       }
     }
   }
