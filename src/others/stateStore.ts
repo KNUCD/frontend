@@ -32,7 +32,7 @@ const closeAtom = atom({
 const detailAtom = atom({
   key: 'detail',
   default: {
-    id: -1,
+    id: 1,
   },
 });
 

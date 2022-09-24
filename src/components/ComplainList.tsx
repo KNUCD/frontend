@@ -126,6 +126,7 @@ const StyledComplainList = styled.div<StyledComplainListProps>`
   z-index: 2;
   transform: ${(props) => (props.isClosed ? 'translateX(-100%)' : 'translateX(0)')};
   transition: 1s;
+  background: #fff;
   & .close {
     display: flex;
     justify-content: center;
