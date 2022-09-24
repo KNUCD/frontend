@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import GoBack from '/public/goBack.svg';
 import GoFront from '/public/goFront.svg';
-import { useRecoilState } from 'recoil';
-import { closeAtom } from 'others/stateStore';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { closeAtom, detailAtom } from 'others/stateStore';
 
 const ComplainDetail: React.FC = () => {
   const [closeData, setCloseData] = useRecoilState(closeAtom);
   const { isClosed } = closeData;
+  const id = useRecoilValue(detailAtom);
+  console.log(id);
+
   const comments = [
     {
       name: '곽나영',

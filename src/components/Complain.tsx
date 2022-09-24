@@ -8,23 +8,51 @@ import Heart from '/public/heart.svg';
 import Comment from '/public/comment.svg';
 import Share from '/public/share.svg';
 import Image from 'next/image';
+import { Category } from 'others/IntegrateInterfaces';
+import { colorByCategory, getDayOfWeek } from 'constants/default';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { closeAtom, detailAtom } from 'others/stateStore';
 
-const Complain: React.FC = () => {
+interface ComplainProps {
+  category: Category;
+  content: string;
+  createdDate: string;
+  file: string | null;
+  id: number;
+  title: string;
+  writerName: string;
+}
+
+const Complain: React.FC<ComplainProps> = ({ category, content, createdDate, file, id, title, writerName }) => {
+  const processedCreatedDate = createdDate.substr(0, 10);
+  const [closeData, setCloseData] = useRecoilState(closeAtom);
+  const setDetailId = useSetRecoilState(detailAtom);
+
+  const handleDetail = () => {
+    const tempData = { ...closeData };
+    tempData.isClosed = false;
+    tempData.isList = false;
+    setCloseData(tempData);
+    setDetailId({
+      id,
+    });
+  };
+
   return (
-    <StyledComplain>
+    <StyledComplain onClick={handleDetail}>
       <div className={'title'}>
         <div>
-          <Pin fill={'#F5564E'} />
+          <Pin fill={`${colorByCategory[category]}`} />
         </div>
-        <p>쓰레기 불법투기 문제 개선방안 건의합니다!</p>
+        <p>{title}</p>
       </div>
 
       <div className={'header'}>
         <div className={'profile'}>
           <div className={'img'}></div>
           <div className={'texts'}>
-            <h3>곽나영</h3>
-            <p>2022-09-21 수</p>
+            <h3>{writerName}</h3>
+            <p>{`${processedCreatedDate} ${getDayOfWeek(processedCreatedDate)}`}</p>
           </div>
         </div>
         <div className={'option'}>
@@ -33,12 +61,15 @@ const Complain: React.FC = () => {
       </div>
 
       <div className={'content'}>
-        <h3>
-          대성환경에너지(주)에서는 악취 발생의 주요 물질인 매립가스 포집을 이행하고 있으며, 매립가스 포집 배관의 막힘
-          발생으로 인한 포집불량 지역에 대해서 호스...
-        </h3>
-        <p>자세히보기</p>
-        <div className={'img'}></div>
+        {content.length > 74 ? (
+          <>
+            <h3>{`${content.substr(0, 74)}...`}</h3>
+            <p>자세히보기</p>
+          </>
+        ) : (
+          <h3>{content}</h3>
+        )}
+        {file && <Image src={file ?? ''} width="100%" height="100%" layout="responsive" objectFit="contain" />}
         <div className={'interaction'}>
           <div>
             <div>
@@ -93,6 +124,7 @@ const StyledComplain = styled.div`
   flex-direction: column;
   width: 100%;
   background: #fff;
+  cursor: pointer;
 
   & .title {
     display: flex;
@@ -166,11 +198,6 @@ const StyledComplain = styled.div`
       margin-bottom: 22px;
       padding: 0 50px 0 24px;
       cursor: pointer;
-    }
-    & .img {
-      width: 100%;
-      height: 300px;
-      background: #ddd;
     }
     & .interaction {
       display: flex;

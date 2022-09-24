@@ -24,15 +24,15 @@ const WritingPage: React.FC = () => {
   const handleWriting = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
+    const img = Object(data.get('img'));
     const body = {
       latitude: posData?.lat,
       longitude: posData?.lng,
       title: data.get('title'),
       content: data.get('content'),
-      file: data.get('img'),
-      category: data.get('category'),
+      category: choicedPin,
+      file: img.size === 0 ? undefined : data.get('img'),
     };
-
     const res = await myAxios('post', 'api/v1/complaint', body, undefined, undefined, 'multipart/form-data');
     console.log(res);
   };
@@ -109,9 +109,15 @@ const WritingPage: React.FC = () => {
                 type={'text'}
                 name={'title'}
                 placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}
+                required
               ></input>
               <label>내용</label>
-              <textarea rows={12} placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}></textarea>
+              <textarea
+                name={'content'}
+                rows={12}
+                placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}
+                required
+              ></textarea>
               <label>사진 첨부</label>
               <input type={'file'} name={'img'}></input>
               <button type={'submit'}>이 위치로 핀 찍기</button>

@@ -8,12 +8,17 @@ import Traffic from '/public/traffic.svg';
 import GoBack from '/public/goBack.svg';
 import GoFront from '/public/goFront.svg';
 import { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { closeAtom } from 'others/stateStore';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { categoryAtom, closeAtom, listAtom } from 'others/stateStore';
+import myAxios from 'others/myAxios';
+import { defaultPos } from 'constants/default';
 
 const ComplainList: React.FC = () => {
   const [closeData, setCloseData] = useRecoilState(closeAtom);
+  const [complains, setComplains] = useState([]);
   const { isClosed } = closeData;
+  const category = useRecoilValue(categoryAtom);
+  const [listData, setListData] = useRecoilState(listAtom);
 
   const handleClose = () => {
     const tempData = { ...closeData };
@@ -21,11 +26,21 @@ const ComplainList: React.FC = () => {
     setCloseData(tempData);
   };
 
+  const getComplainList = async () => {
+    const { category, ha, qa, oa, pa } = listData;
+    const res = await myAxios('get', `api/v1/complaint?category=${category}&ha=${ha}&qa=${qa}&oa=${oa}&pa=${pa}`);
+    setComplains(res.data.response);
+  };
+
   useEffect(() => {
     const tempData = { ...closeData };
     tempData.isMapPage = true;
     tempData.isList = true;
     setCloseData(tempData);
+  }, []);
+
+  useEffect(() => {
+    getComplainList();
   }, []);
 
   return (
@@ -65,9 +80,21 @@ const ComplainList: React.FC = () => {
         </div>
       </ComplainListHeader>
       <Complains>
-        <Complain></Complain>
-        <Complain></Complain>
-        <Complain></Complain>
+        {complains.map((complain, index) => {
+          const { category, content, createdDate, file, id, title, writerName } = complain;
+          return (
+            <Complain
+              key={index}
+              category={category}
+              content={content}
+              createdDate={createdDate}
+              file={file}
+              id={id}
+              title={title}
+              writerName={writerName}
+            ></Complain>
+          );
+        })}
       </Complains>
       <div className={'close'} onClick={handleClose}>
         {isClosed ? <GoFront /> : <GoBack />}

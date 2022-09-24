@@ -25,8 +25,31 @@ const closeAtom = atom({
   default: {
     isMapPage: false,
     isClosed: false,
-    isList: true,
+    isList: false,
   },
 });
 
-export { geolocationAtom, realTimeAtom, closeAtom };
+const detailAtom = atom({
+  key: 'detail',
+  default: {
+    id: -1,
+  },
+});
+
+const listAtom = atom({
+  key: 'list',
+  default: {
+    category: 'ALL',
+    ha: defaultPos.lat - 1,
+    qa: defaultPos.lng - 1,
+    oa: defaultPos.lat + 1,
+    pa: defaultPos.lng + 1,
+  },
+});
+
+const categoryAtom = atom({
+  key: 'category',
+  default: 'ALL',
+});
+
+export { geolocationAtom, realTimeAtom, closeAtom, categoryAtom, detailAtom, listAtom };
