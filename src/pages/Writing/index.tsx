@@ -2,7 +2,7 @@ import MyMap from 'components/Map';
 import { StyledPage } from 'others/CommonStyles';
 import { Category } from 'others/IntegrateInterfaces';
 import myAxios from 'others/myAxios';
-import { useState, ChangeEventHandler, ReactEventHandler } from 'react';
+import { useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import OptionalPin from '/public/optionalPin.svg';
 import { useRouter } from 'next/router';
@@ -51,7 +51,7 @@ const WritingPage: React.FC = () => {
     setIsAgree(!isAgree);
   };
 
-  const fileUpload = (e: ChangeEventHandler<HTMLInputElement>) => {
+  const fileUpload = (e: ChangeEvent<HTMLInputElement>) => {
     setIsFile(e.target.value ? true : false);
   };
 
