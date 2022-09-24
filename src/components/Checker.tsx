@@ -14,6 +14,7 @@ const Checker: React.FC = () => {
   const checkLogin = async () => {
     const res = await myAxios('post', 'api/v1/auth/account-token', null, true);
     setAccessToken(res.data.response.accessToken);
+    setIsReady(true);
   };
 
   useEffect(() => {
@@ -37,7 +38,6 @@ const Checker: React.FC = () => {
 
   useEffect(() => {
     checkLogin();
-    setIsReady(true);
   }, []);
 
   useInterval(() => {

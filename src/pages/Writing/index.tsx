@@ -2,7 +2,7 @@ import MyMap from 'components/Map';
 import { StyledPage } from 'others/CommonStyles';
 import { Category } from 'others/IntegrateInterfaces';
 import myAxios from 'others/myAxios';
-import { useState } from 'react';
+import { useState, ChangeEventHandler, ReactEventHandler } from 'react';
 import styled from 'styled-components';
 import OptionalPin from '/public/optionalPin.svg';
 import { useRouter } from 'next/router';
@@ -15,6 +15,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { accessTokenAtom, closeAtom } from 'others/stateStore';
 
 const WritingPage: React.FC = () => {
+  const [isFile, setIsFile] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [closeData, setCloseData] = useRecoilState(closeAtom);
   const [isAgree, setIsAgree] = useState(false);
@@ -39,8 +40,7 @@ const WritingPage: React.FC = () => {
       category: choicedPin,
       file: img.size === 0 ? undefined : data.get('img'),
     };
-    console.log(accessToken);
-    const res = await myAxios('post', 'api/v1/complaint', body, true, accessToken, 'multipart/form-data');
+    await myAxios('post', 'api/v1/complaint', body, true, accessToken, 'multipart/form-data');
     const tempData = { ...closeData };
     tempData.isMapPage = true;
     setCloseData(tempData);
@@ -51,12 +51,19 @@ const WritingPage: React.FC = () => {
     setIsAgree(!isAgree);
   };
 
+  const fileUpload = (e: ChangeEventHandler<HTMLInputElement>) => {
+    setIsFile(e.target.value ? true : false);
+  };
+
   return (
     <StyledWritingPage choicedPin={choicedPin ?? 'LIFE'}>
       {posData ? (
         <>
           {choicedPin && (
             <div className={'writing'}>
+              <button className={'cancel'} onClick={() => router.back()}>
+                취소하기
+              </button>
               <StyledPreComplain choicedPin={choicedPin}>
                 <h2>민원 작성하기</h2>
 
@@ -132,7 +139,12 @@ const WritingPage: React.FC = () => {
                     required
                   ></textarea>
                   <label>사진 첨부</label>
-                  <input type={'file'} name={'img'}></input>
+                  <div className="filebox">
+                    <label htmlFor="file" className={isFile ? 'done' : ''}>{`${
+                      isFile ? '등록 완료' : '사진 추가하기'
+                    }`}</label>
+                    <input type={'file'} id="file" accept={'image/*'} name={'img'} onChange={fileUpload}></input>
+                  </div>
                   <button type={'submit'} disabled={disabled}>
                     이 위치로 핀 찍기
                   </button>
@@ -386,6 +398,22 @@ const StyledWritingPage = styled(StyledPage)<StyledWritingPageProps>`
     display: flex;
     width: 100%;
     height: 100%;
+    & > .cancel {
+      position: fixed;
+      top: 24px;
+      right: 16px;
+      width: 124px;
+      height: 48px;
+      cursor: pointer;
+      filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.25));
+      border-radius: 5px;
+      background: #fff;
+      font-weight: 700;
+      font-size: 20px;
+      color: ${(props) => colorByCategory[props.choicedPin]};
+      outline: none;
+      border: none;
+    }
     & form {
       display: flex;
       flex-direction: column;
@@ -397,7 +425,8 @@ const StyledWritingPage = styled(StyledPage)<StyledWritingPageProps>`
       & > label,
       input,
       button,
-      textarea {
+      textarea,
+      > div {
         width: 100%;
         max-width: 485px;
       }
@@ -436,6 +465,32 @@ const StyledWritingPage = styled(StyledPage)<StyledWritingPageProps>`
         border: none;
         filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.25));
         border-radius: 5px;
+      }
+      & .filebox label {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        padding: 0.5em 0.75em;
+        color: #999;
+        cursor: pointer;
+        background: #ffffff;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
+        border-radius: 3px;
+      }
+
+      & .done {
+        color: #333 !important;
+      }
+
+      & .filebox input[type='file'] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
       }
     }
   }
