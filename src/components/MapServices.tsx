@@ -1,13 +1,13 @@
 import { useRouter } from 'next/router';
 import { RefObject, Ref, Dispatch, SetStateAction } from 'react';
-import { closeAtom, geolocationAtom, realTimeAtom } from 'others/stateStore';
+import { accessTokenAtom, closeAtom, geolocationAtom, realTimeAtom } from 'others/stateStore';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import Pencil from '/public/pencil.svg';
 import Plus from '/public/plus.svg';
 import Minus from '/public/minus.svg';
 import RealTime from '/public/realTime.svg';
-import { colorByCategory, defaultPos } from '../constants/default';
+import { colorByCategory, defaultPos, loginURL } from '../constants/default';
 import { Category, Path } from 'others/IntegrateInterfaces';
 
 interface MapServicesProps {
@@ -29,6 +29,8 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData, set
   const myPos = useRecoilValue(geolocationAtom);
   const [realTimeData, setRealTimeData] = useRecoilState(realTimeAtom);
   const { isRealTime, fixedPos } = realTimeData;
+  const accessToken = useRecoilValue(accessTokenAtom);
+
   const handleRealTimeValue = () => {
     const map = mapRef.current;
     if (!isRealTime) {
@@ -47,6 +49,11 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData, set
   };
 
   const directToWritingPage = () => {
+    if (accessToken === '') {
+      router.push(loginURL);
+      return;
+    }
+
     const tempData = { ...closeData };
     tempData.isMapPage = false;
     setCloseData(tempData);

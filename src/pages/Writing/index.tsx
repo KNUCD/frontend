@@ -45,6 +45,7 @@ const WritingPage: React.FC = () => {
     tempData.isMapPage = true;
     setCloseData(tempData);
     router.push('/map');
+    setDisabled(false);
   };
 
   const handleCheckbox = () => {

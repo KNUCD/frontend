@@ -112,7 +112,7 @@ const ComplainList: React.FC = () => {
       </ComplainListHeader>
       <Complains>
         {complains.map((complain, index) => {
-          const { category, content, createdDate, file, id, title, writerName } = complain;
+          const { category, content, createdDate, file, id, title, writerName, writerImg } = complain;
           return (
             <Complain
               key={index}
@@ -123,6 +123,7 @@ const ComplainList: React.FC = () => {
               id={id}
               title={title}
               writerName={writerName}
+              writerImg={writerImg}
             ></Complain>
           );
         })}
