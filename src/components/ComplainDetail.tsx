@@ -28,6 +28,7 @@ interface detailDataProps {
   file: string | null;
   title: string;
   writerName: string;
+  writerImg: string;
 }
 
 const ComplainDetail: React.FC = () => {
@@ -118,7 +119,9 @@ const ComplainDetail: React.FC = () => {
       {detailData && (
         <div className={'slide'}>
           <div className={'profile'}>
-            <div className={'img'}></div>
+            <div className={'img'}>
+              <img src={detailData.writerImg} />
+            </div>
             <div className={'texts'}>
               <h3>{detailData.writerName}</h3>
               <p>{`${detailData.createdDate.substr(0, 10)} ${getDayOfWeek(detailData.createdDate.substr(0, 10))}`}</p>
@@ -303,6 +306,11 @@ const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
       height: 40px;
       background: #ddd;
       border-radius: 100%;
+      overflow: hidden;
+      & > img {
+        width: 100%;
+        height: 100%;
+      }
     }
     & .texts {
       display: flex;

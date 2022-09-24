@@ -16,6 +16,7 @@ const Checker: React.FC = () => {
       const res = await myAxios('post', 'api/v1/auth/account-token', null, true);
       setAccessToken(res.data.response.accessToken);
     } catch (e) {
+      console.log(e);
     } finally {
       setIsReady(true);
     }

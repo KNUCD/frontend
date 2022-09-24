@@ -46,8 +46,8 @@ const HomePage: React.FC = () => {
           지역 주민들과 함께 해결책을 찾아나갈 수 있습니다.
         </p>
         <div>
-          <Link href={'/writing'} passHref>
-            <StyledLink className={'writing'} onClick={handleCloseData}>
+          <Link href={accessToken === '' ? '' : '/writing'} passHref>
+            <StyledLink className={'writing'} onClick={accessToken === '' ? handleLogin : handleCloseData}>
               <div>
                 <Pencil fill={'white'} />
               </div>

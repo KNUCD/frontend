@@ -33,13 +33,13 @@ const Nav: React.FC = () => {
             <StyledBar fill={router.asPath === '/map' ? ACTIVE : NON_ACTIVE} />
           </StyledLink>
         </Link>
-        <Link href={'/complains'} passHref>
+        <Link href={''} passHref>
           <StyledLink>
             <Complains fill={router.asPath === '/complains' ? ACTIVE : NON_ACTIVE} />
             <StyledBar fill={router.asPath === '/complains' ? ACTIVE : NON_ACTIVE} />
           </StyledLink>
         </Link>
-        <Link href={'/ideas'} passHref>
+        <Link href={''} passHref>
           <StyledLink>
             <Ideas fill={router.asPath === '/ideas' ? ACTIVE : NON_ACTIVE} />
             <StyledBar fill={router.asPath === '/ideas' ? ACTIVE : NON_ACTIVE} />
@@ -48,13 +48,13 @@ const Nav: React.FC = () => {
       </div>
       <div></div>
       <div className={'footer'}>
-        <Link href={'/profile'} passHref>
+        <Link href={''} passHref>
           <StyledLink>
             <Profile fill={router.asPath === '/profile' ? ACTIVE : NON_ACTIVE} />
             <StyledBar fill={router.asPath === '/profile' ? ACTIVE : NON_ACTIVE} />
           </StyledLink>
         </Link>
-        <Link href={'/setting'} passHref>
+        <Link href={''} passHref>
           <StyledLink>
             <Setting fill={router.asPath === '/setting' ? ACTIVE : NON_ACTIVE} />
             <StyledBar fill={router.asPath === '/setting' ? ACTIVE : NON_ACTIVE} />

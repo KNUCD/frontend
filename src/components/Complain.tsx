@@ -26,9 +26,19 @@ interface ComplainProps {
   id: number;
   title: string;
   writerName: string;
+  writerImg: string;
 }
 
-const Complain: React.FC<ComplainProps> = ({ category, content, createdDate, file, id, title, writerName }) => {
+const Complain: React.FC<ComplainProps> = ({
+  category,
+  content,
+  createdDate,
+  file,
+  id,
+  title,
+  writerName,
+  writerImg,
+}) => {
   const processedCreatedDate = createdDate.substr(0, 10);
   const [closeData, setCloseData] = useRecoilState(closeAtom);
   const setDetailId = useSetRecoilState(detailAtom);
@@ -76,7 +86,9 @@ const Complain: React.FC<ComplainProps> = ({ category, content, createdDate, fil
 
       <div className={'header'}>
         <div className={'profile'}>
-          <div className={'img'}></div>
+          <div className={'img'}>
+            <img src={writerImg} />
+          </div>
           <div className={'texts'}>
             <h3>{writerName}</h3>
             <p>{`${processedCreatedDate} ${getDayOfWeek(processedCreatedDate)}`}</p>
@@ -213,6 +225,11 @@ const StyledComplain = styled.div`
         height: 40px;
         background: #ddd;
         border-radius: 100%;
+        overflow: hidden;
+        & > img {
+          width: 100%;
+          height: 100%;
+        }
       }
       & .texts {
         display: flex;
