@@ -11,8 +11,12 @@ import { colorByCategory } from 'constants/default';
 import Life from '/public/life.svg';
 import Security from '/public/security.svg';
 import Traffic from '/public/traffic.svg';
+import { useRecoilState } from 'recoil';
+import { closeAtom } from 'others/stateStore';
 
 const WritingPage: React.FC = () => {
+  const [disabled, setDisabled] = useState(false);
+  const [closeData, setCloseData] = useRecoilState(closeAtom);
   const [isAgree, setIsAgree] = useState(false);
   const [choicedPin, setChoicedPin] = useState<Category | null>(null);
   const [posData, setPosData] = useState<{
@@ -23,6 +27,7 @@ const WritingPage: React.FC = () => {
 
   const handleWriting = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setDisabled(true);
     const data = new FormData(e.currentTarget);
     const img = Object(data.get('img'));
     const body = {
@@ -34,7 +39,10 @@ const WritingPage: React.FC = () => {
       file: img.size === 0 ? undefined : data.get('img'),
     };
     const res = await myAxios('post', 'api/v1/complaint', body, undefined, undefined, 'multipart/form-data');
-    console.log(res);
+    const tempData = { ...closeData };
+    tempData.isMapPage = true;
+    setCloseData(tempData);
+    router.push('/map');
   };
 
   const handleCheckbox = () => {
@@ -44,86 +52,93 @@ const WritingPage: React.FC = () => {
   return (
     <StyledWritingPage choicedPin={choicedPin ?? 'LIFE'}>
       {posData ? (
-        <div className={'writing'}>
-          <StyledPreComplain choicedPin={choicedPin ?? 'LIFE'}>
-            <h2>민원 작성하기</h2>
-            <div className={'category'}>
-              <button className={'life'}>
-                <div>
-                  <Life />
+        <>
+          {choicedPin && (
+            <div className={'writing'}>
+              <StyledPreComplain choicedPin={choicedPin}>
+                <h2>민원 작성하기</h2>
+
+                <div className={'category'}>
+                  <button className={`life${choicedPin === 'LIFE' ? '' : 'NonActive'}`}>
+                    <div>
+                      <Life fill={choicedPin === 'LIFE' ? 'white' : colorByCategory['LIFE']} />
+                    </div>
+                    <p>생활불편</p>
+                  </button>
+                  <button className={`security${choicedPin === 'SECURITY' ? '' : 'NonActive'}`}>
+                    <div>
+                      <Security fill={choicedPin === 'SECURITY' ? 'white' : colorByCategory['SECURITY']} />
+                    </div>
+                    <p>사회안전</p>
+                  </button>
+                  <button className={`traffic${choicedPin === 'TRAFFIC' ? '' : 'NonActive'}`}>
+                    <div>
+                      <Traffic fill={choicedPin === 'TRAFFIC' ? 'white' : colorByCategory['TRAFFIC']} />
+                    </div>
+                    <p>교통불편</p>
+                  </button>
                 </div>
-                <p>생활불편</p>
-              </button>
-              <button className={'security'}>
-                <div>
-                  <Security />
+                <div className={'map'}>
+                  <MyMap
+                    props={{
+                      path: 'writing',
+                      choicedPin,
+                      isWriting: true,
+                      posData,
+                    }}
+                  />
+                  {choicedPin && (
+                    <WritingConstMarker>
+                      <Pin fill={colorByCategory[choicedPin]} />
+                    </WritingConstMarker>
+                  )}
                 </div>
-                <p>사회안전</p>
-              </button>
-              <button className={'traffic'}>
-                <div>
-                  <Traffic />
+                <h3>개인정보 수집 및 이용안내</h3>
+                <textarea rows={9} readOnly>
+                  1. 수집 및 이용 목적 (개인정보보호법 제15조) 핀플레인은 관계법령 등에서 정하는 소관 업무의 수행을
+                  위하여 다음과 같이 개인정보를 수집 및 이용합니다.&#10;&#10;수집된 개인정보는 정해진 목적 이외의
+                  용도로는 이용되지 않습니다. ※ 관계법령 : 민원처리에 관한 법률 및 동법 시행령, 전자정부법 및 동법
+                  시행령 가. 민원, 제안, 질의, 신고 등 모든 시민의견 접수·처리·사후관리 서비스 신청에 포함된 개인정보는
+                  소관 업무수행을 위해 행정·공공기관에서 이용합니다. 나. 타 행정·공공기관 시스템 이용 민원의 전자적
+                  처리를 위해 내부적으로 타 시스템 연계 및 이용 시 개인정보를 이용합니다. 다. 핀플레인 서비스 향상 및
+                  정책평가를 위하여 접수된 민원은 관계법령에 따라 분석·평가 및 처리결과의 사후관리를 시행합니다.
+                </textarea>
+                <div className={'agree'}>
+                  <input
+                    type="checkbox"
+                    id="agree"
+                    value={isAgree ? 'agree' : 'disagree'}
+                    onChange={handleCheckbox}
+                  ></input>
+                  <p>위 개인정보 수집 및 이용에 동의합니다</p>
                 </div>
-                <p>교통불편</p>
-              </button>
-            </div>
-            <div className={'map'}>
-              <MyMap
-                props={{
-                  path: 'writing',
-                  choicedPin,
-                  isWriting: true,
-                  posData,
-                }}
-              />
-              {choicedPin && (
-                <WritingConstMarker>
-                  <Pin fill={colorByCategory[choicedPin]} />
-                </WritingConstMarker>
+              </StyledPreComplain>
+              {isAgree && (
+                <form onSubmit={handleWriting} encType={'multipart/form-data'}>
+                  <label>제목</label>
+                  <input
+                    type={'text'}
+                    name={'title'}
+                    placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}
+                    required
+                  ></input>
+                  <label>내용</label>
+                  <textarea
+                    name={'content'}
+                    rows={12}
+                    placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}
+                    required
+                  ></textarea>
+                  <label>사진 첨부</label>
+                  <input type={'file'} name={'img'}></input>
+                  <button type={'submit'} disabled={disabled}>
+                    이 위치로 핀 찍기
+                  </button>
+                </form>
               )}
             </div>
-            <h3>개인정보 수집 및 이용안내</h3>
-            <textarea rows={9} readOnly>
-              1. 수집 및 이용 목적 (개인정보보호법 제15조) 핀플레인은 관계법령 등에서 정하는 소관 업무의 수행을 위하여
-              다음과 같이 개인정보를 수집 및 이용합니다.&#10;&#10;수집된 개인정보는 정해진 목적 이외의 용도로는 이용되지
-              않습니다. ※ 관계법령 : 민원처리에 관한 법률 및 동법 시행령, 전자정부법 및 동법 시행령 가. 민원, 제안,
-              질의, 신고 등 모든 시민의견 접수·처리·사후관리 서비스 신청에 포함된 개인정보는 소관 업무수행을 위해
-              행정·공공기관에서 이용합니다. 나. 타 행정·공공기관 시스템 이용 민원의 전자적 처리를 위해 내부적으로 타
-              시스템 연계 및 이용 시 개인정보를 이용합니다. 다. 핀플레인 서비스 향상 및 정책평가를 위하여 접수된 민원은
-              관계법령에 따라 분석·평가 및 처리결과의 사후관리를 시행합니다.
-            </textarea>
-            <div className={'agree'}>
-              <input
-                type="checkbox"
-                id="agree"
-                value={isAgree ? 'agree' : 'disagree'}
-                onChange={handleCheckbox}
-              ></input>
-              <p>위 개인정보 수집 및 이용에 동의합니다</p>
-            </div>
-          </StyledPreComplain>
-          {isAgree && (
-            <form onSubmit={handleWriting} encType={'multipart/form-data'}>
-              <label>제목</label>
-              <input
-                type={'text'}
-                name={'title'}
-                placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}
-                required
-              ></input>
-              <label>내용</label>
-              <textarea
-                name={'content'}
-                rows={12}
-                placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}
-                required
-              ></textarea>
-              <label>사진 첨부</label>
-              <input type={'file'} name={'img'}></input>
-              <button type={'submit'}>이 위치로 핀 찍기</button>
-            </form>
           )}
-        </div>
+        </>
       ) : (
         <>
           {!choicedPin && (
@@ -192,12 +207,11 @@ const StyledPreComplain = styled.div<StyledPreComplainProps>`
     margin: 20px 0 30px 0;
   }
 
-  & > .category {
+  & .category {
     display: flex;
     width: 100%;
+    margin-bottom: 14px;
     gap: 9px;
-    margin-bottom: 12px;
-
     & > button {
       display: flex;
       align-items: center;
@@ -224,14 +238,37 @@ const StyledPreComplain = styled.div<StyledPreComplainProps>`
     & .life {
       background: #f5564e;
     }
+    & .lifeNonActive {
+      background: #fff;
+      border: 1px solid #f5564e;
+      border-radius: 3px;
+      & > p {
+        color: #f5564e;
+      }
+    }
     & .security {
       background: #2e3192;
+    }
+    & .securityNonActive {
+      background: #fff;
+      border: 1px solid #2e3192;
+      border-radius: 3px;
+      & > p {
+        color: #2e3192;
+      }
     }
     & .traffic {
       background: #662d91;
     }
+    & .trafficNonActive {
+      background: #fff;
+      border: 1px solid #662d91;
+      border-radius: 3px;
+      & > p {
+        color: #662d91;
+      }
+    }
   }
-
   & .map {
     position: relative;
     margin-bottom: 70px;
@@ -357,7 +394,8 @@ const StyledWritingPage = styled(StyledPage)<StyledWritingPageProps>`
       padding: 20px;
       & > label,
       input,
-      button {
+      button,
+      textarea {
         width: 100%;
         max-width: 485px;
       }

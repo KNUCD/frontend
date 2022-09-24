@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, SetStateAction, Dispatch } from 'react';
 import { Map, MarkerClusterer, MapMarker } from 'react-kakao-maps-sdk';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { closeAtom, geolocationAtom, realTimeAtom } from 'others/stateStore';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { closeAtom, detailAtom, geolocationAtom, listAtom, realTimeAtom } from 'others/stateStore';
 import MapServices from './MapServices';
 import { Category, Obj, Path } from 'others/IntegrateInterfaces';
 import useInterval from 'use-interval';
@@ -36,6 +36,13 @@ interface Pin {
   category: Category;
 }
 
+interface Bound {
+  ha: number;
+  qa: number;
+  oa: number;
+  pa: number;
+}
+
 const MyMap: React.FC<MyMapProps> = ({
   props: { path, setPosData, setChoicedPin, choicedPin, isWriting = false, posData },
 }) => {
@@ -46,30 +53,51 @@ const MyMap: React.FC<MyMapProps> = ({
   const [realTimeData, setRealTimeData] = useRecoilState(realTimeAtom);
   const { isRealTime, fixedPos } = realTimeData;
   const [closeData, setCloseData] = useRecoilState(closeAtom);
-  const [category, setCategory] = useState<Category>('ALL');
+  const [listData, setListData] = useRecoilState(listAtom);
+  const setDetailAtom = useSetRecoilState(detailAtom);
 
-  const onClusterClick = (_target: kakao.maps.MarkerClusterer, cluster: kakao.maps.Cluster) => {
+  const onClusterClick = async (_target: kakao.maps.MarkerClusterer, cluster: kakao.maps.Cluster) => {
     const map = mapRef.current;
     if (!map) return;
     const nowLevel = map?.getLevel();
     if (nowLevel < 4) {
-      const bound = cluster.getBounds();
-      // ha : 지도 좌측하단 위도
-      // qa : 지도 좌측 하단 경도
-      // oa : 지도 우측 상단 위도
-      // pa : 지도 우측 상단 경도
+      const bound = Object(cluster.getBounds());
+      // ha : 지도 좌측 하단 경도
+      // qa : 지도 좌측 하단 위도
+      // oa : 지도 우측 상단 경도
+      // pa : 지도 우측 상단 위도
+      const { ha, qa, oa, pa } = bound;
+      const tempListData = { ...listData };
+
+      tempListData.ha = ha;
+      tempListData.qa = qa;
+      tempListData.oa = oa;
+      tempListData.pa = pa;
+      setListData(tempListData);
+
+      const tempData = { ...closeData };
+      tempData.isClosed = false;
+      tempData.isList = true;
+      setCloseData(tempData);
     } else {
       const level = nowLevel - 1;
       map.setLevel(level, { anchor: cluster.getCenter() });
     }
   };
 
-  const onMarkerClick = (_target: kakao.maps.Marker) => {
-    const markerPos = _target.getPosition();
+  const onMarkerClick = (_target: kakao.maps.Marker, id: number) => {
+    // const markerPos = _target.getPosition();
+    setDetailAtom({
+      id,
+    });
+    const tempData = { ...closeData };
+    tempData.isList = false;
+    tempData.isClosed = false;
+    setCloseData(tempData);
   };
 
   const handleRefreshPin = async () => {
-    const res = await myAxios('get', `api/v1/complaint/pin?category=${category}`);
+    const res = await myAxios('get', `api/v1/complaint/pin?category=${listData.category}`);
     setPins(res.data.response);
   };
 
@@ -87,6 +115,10 @@ const MyMap: React.FC<MyMapProps> = ({
     });
     handleRefreshPin();
   }, []);
+
+  useEffect(() => {
+    handleRefreshPin();
+  }, [listData.category]);
 
   useInterval(() => {
     handleRefreshPin();
@@ -150,7 +182,7 @@ const MyMap: React.FC<MyMapProps> = ({
                             height: 40,
                           },
                         }}
-                        onClick={onMarkerClick}
+                        onClick={(marker) => onMarkerClick(marker, pin.id)}
                       ></MapMarker>
                     );
                   })}

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { RefObject, Ref, Dispatch, SetStateAction } from 'react';
-import { geolocationAtom, realTimeAtom } from 'others/stateStore';
+import { closeAtom, geolocationAtom, realTimeAtom } from 'others/stateStore';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { colorByCategory, defaultPos } from '../constants/default';
@@ -20,6 +20,7 @@ interface MapServicesProps {
 }
 
 const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData, setChoicedPin, choicedPin }) => {
+  const [closeData, setCloseData] = useRecoilState(closeAtom);
   const router = useRouter();
   const myPos = useRecoilValue(geolocationAtom);
   const [realTimeData, setRealTimeData] = useRecoilState(realTimeAtom);
@@ -42,6 +43,10 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData, set
   };
 
   const directToWritingPage = () => {
+    const tempData = { ...closeData };
+    tempData.isMapPage = false;
+    setCloseData(tempData);
+
     if (!isRealTime) {
       const map = mapRef.current;
       setRealTimeData({

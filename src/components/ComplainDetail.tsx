@@ -14,7 +14,7 @@ import Share from '/public/share.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { closeAtom, detailAtom } from 'others/stateStore';
 import myAxios from 'others/myAxios';
-import { colorByCategory } from 'constants/default';
+import { colorByCategory, getDayOfWeek } from 'constants/default';
 import { Category } from 'others/IntegrateInterfaces';
 import Image from 'next/image';
 
@@ -57,7 +57,6 @@ const ComplainDetail: React.FC = () => {
   const getDetailData = async () => {
     const res = await myAxios('get', `api/v1/complaint/${id}`);
     setDetailData(res.data.response);
-    console.log(res.data.response);
   };
 
   const goBackToList = () => {
@@ -69,7 +68,7 @@ const ComplainDetail: React.FC = () => {
 
   useEffect(() => {
     getDetailData();
-  }, []);
+  }, [id]);
 
   return (
     <StyledComplainDetail isClosed={isClosed}>
@@ -82,97 +81,95 @@ const ComplainDetail: React.FC = () => {
         </div>
       </div>
 
-      <div className={'slide'}>
-        <div className={'profile'}>
-          <div className={'img'}></div>
-          <div className={'texts'}>
-            <h3>곽나영</h3>
-            <p>{`2022-09-21 수`}</p>
-          </div>
-        </div>
-
-        <div className={'detail'}>
-          <div className={'title'}>쓰레기 불법투기 문제 개선방안 건의합니다!</div>
-          <div className={'body'}>
-            대성환경에너지(주)에서는 악취 발생의 주요 물질인 매립가스 포집을 이행하고 있으며, 매립가스 포집 배관의 막힘
-            발생으로 인한 포집불량 지역에 대해서 호스대성환경에너지(주)에서는 악취 발생의 주요 물질인 매립가스 포집을
-            이행하고 있으며, 매립가스 포집 배관의 막힘 발생으로 인한 포집불량 지역에 대해서 호스
-          </div>
-          {detailData && detailData.file && (
-            <Image src={detailData.file} width="100%" height="100%" layout="responsive" objectFit="contain" />
-          )}
-          <div className={'interaction'}>
-            <div>
-              <div>
-                <div>
-                  <Good />
-                </div>
-                <p>23</p>
-              </div>
-              <div>
-                <div>
-                  <Bad />
-                </div>
-                <p>13</p>
-              </div>
-              <div>
-                <div>
-                  <Amazing />
-                </div>
-                <p>87</p>
-              </div>
+      {detailData && (
+        <div className={'slide'}>
+          <div className={'profile'}>
+            <div className={'img'}></div>
+            <div className={'texts'}>
+              <h3>{detailData.writerName}</h3>
+              <p>{`${detailData.createdDate.substr(0, 10)} ${getDayOfWeek(detailData.createdDate.substr(0, 10))}`}</p>
             </div>
-            <p>공유 23회</p>
           </div>
-          <div className={'grey'}></div>
-        </div>
 
-        <div className={'comments'}>
-          {comments.map(({ name, body, date }, index) => {
-            return (
-              <Comment key={index}>
-                <div className={'profile'}>
-                  <div className={'img'}></div>
-                  <div className={'texts'}>
-                    <h3>{name}</h3>
-                    <p>{date}</p>
+          <div className={'detail'}>
+            <div className={'title'}>{detailData.title}</div>
+            <div className={'body'}>{detailData.content}</div>
+            {detailData && detailData.file && (
+              <Image src={detailData.file} width="100%" height="100%" layout="responsive" objectFit="contain" />
+            )}
+            <div className={'interaction'}>
+              <div>
+                <div>
+                  <div>
+                    <Good />
                   </div>
+                  <p>23</p>
                 </div>
-                <p>{body}</p>
-                <div className={'option'}>
-                  <Option />
+                <div>
+                  <div>
+                    <Bad />
+                  </div>
+                  <p>13</p>
                 </div>
-              </Comment>
-            );
-          })}
-        </div>
-        <div className={'commentFooter'}>
-          <div>
-            <button>
-              <div>
-                <Heart />
+                <div>
+                  <div>
+                    <Amazing />
+                  </div>
+                  <p>87</p>
+                </div>
               </div>
-              <p>감정 남기기</p>
-            </button>
-            <button>
-              <div>
-                <CommentIcon />
-              </div>
-              <p>댓글 9</p>
-            </button>
-            <button>
-              <div>
-                <Share />
-              </div>
-              <p>공유하기</p>
-            </button>
+              <p>공유 23회</p>
+            </div>
+            <div className={'grey'}></div>
           </div>
-          <input type={'text'} placeholder={'댓글을 입력해주세요'}></input>
+
+          <div className={'comments'}>
+            {comments.map(({ name, body, date }, index) => {
+              return (
+                <Comment key={index}>
+                  <div className={'profile'}>
+                    <div className={'img'}></div>
+                    <div className={'texts'}>
+                      <h3>{name}</h3>
+                      <p>{date}</p>
+                    </div>
+                  </div>
+                  <p>{body}</p>
+                  <div className={'option'}>
+                    <Option />
+                  </div>
+                </Comment>
+              );
+            })}
+          </div>
+          <div className={'commentFooter'}>
+            <div>
+              <button>
+                <div>
+                  <Heart />
+                </div>
+                <p>감정 남기기</p>
+              </button>
+              <button>
+                <div>
+                  <CommentIcon />
+                </div>
+                <p>댓글 9</p>
+              </button>
+              <button>
+                <div>
+                  <Share />
+                </div>
+                <p>공유하기</p>
+              </button>
+            </div>
+            <input type={'text'} placeholder={'댓글을 입력해주세요'}></input>
+          </div>
+          <div className={'close'} onClick={handleClose}>
+            {isClosed ? <GoFront /> : <GoBack />}
+          </div>
         </div>
-        <div className={'close'} onClick={handleClose}>
-          {isClosed ? <GoFront /> : <GoBack />}
-        </div>
-      </div>
+      )}
     </StyledComplainDetail>
   );
 };
@@ -253,12 +250,15 @@ const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
       background: #aaa;
     }
     & .title {
+      word-break: break-all;
       font-weight: 700;
       font-size: 24px;
       padding: 0 50px 0 25px;
       margin-bottom: 20px;
     }
     & .body {
+      word-break: break-all;
+      width: 100%;
       font-weight: 400;
       font-size: 14px;
       padding: 0 50px 0 25px;
@@ -311,7 +311,7 @@ const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-bottom: 140px;
+    margin-bottom: 160px;
   }
   & .commentFooter {
     display: flex;
