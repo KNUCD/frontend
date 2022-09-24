@@ -8,6 +8,7 @@ import useInterval from 'use-interval';
 import myAxios from 'others/myAxios';
 import styled from 'styled-components';
 import Pin from '/public/pin.svg';
+import { defaultPos } from 'constants/default';
 
 interface MyMapProps {
   props: {
@@ -19,7 +20,12 @@ interface MyMapProps {
       } | null>
     >;
     setChoicedPin?: Dispatch<SetStateAction<Category | null>>;
-    choicedPin: Category | null;
+    choicedPin?: Category | null;
+    isWriting?: boolean;
+    posData?: {
+      lat: number;
+      lng: number;
+    } | null;
   };
 }
 
@@ -30,7 +36,9 @@ interface Pin {
   category: Category;
 }
 
-const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData, setChoicedPin, choicedPin } }) => {
+const MyMap: React.FC<MyMapProps> = ({
+  props: { path, setPosData, setChoicedPin, choicedPin, isWriting = false, posData },
+}) => {
   const [pins, setPins] = useState<Pin[]>([]);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const myPos = useRecoilValue(geolocationAtom);
@@ -88,9 +96,11 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData, setChoicedPin,
     <>
       {isMapLoaded && (
         <>
-          <StyledMap transform={handleTransform()}>
+          <StyledMap transform={handleTransform()} isWriting={isWriting}>
             <Map
-              center={isRealTime ? myPos : fixedPos}
+              center={isWriting ? posData ?? defaultPos : isRealTime ? myPos : fixedPos}
+              draggable={isWriting ? false : true}
+              zoomable={isWriting ? false : true}
               style={{
                 width: '100%',
                 height: '100%',
@@ -148,13 +158,15 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData, setChoicedPin,
               )}
             </Map>
           </StyledMap>
-          <MapServices
-            mapRef={mapRef}
-            path={path}
-            setPosData={setPosData}
-            setChoicedPin={setChoicedPin}
-            choicedPin={choicedPin}
-          ></MapServices>
+          {!isWriting && (
+            <MapServices
+              mapRef={mapRef}
+              path={path}
+              setPosData={setPosData}
+              setChoicedPin={setChoicedPin}
+              choicedPin={choicedPin ?? null}
+            ></MapServices>
+          )}
         </>
       )}
     </>
@@ -163,6 +175,7 @@ const MyMap: React.FC<MyMapProps> = ({ props: { path, setPosData, setChoicedPin,
 
 interface StyledMapProps {
   transform: string;
+  isWriting: boolean;
 }
 
 const svgNameByCategory: Obj<string> = {
@@ -172,11 +185,11 @@ const svgNameByCategory: Obj<string> = {
 };
 
 const StyledMap = styled.div<StyledMapProps>`
-  position: absolute;
+  position: ${(props) => (props.isWriting ? '' : 'absolute')};
   top: 0;
   left: ${(props) => props.transform};
-  width: 100vw;
-  height: 100vh;
+  width: ${(props) => (props.isWriting ? '100%' : '100vw')};
+  height: ${(props) => (props.isWriting ? '250px' : '100vh')};
   transition: 1s;
 `;
 

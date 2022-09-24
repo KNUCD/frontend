@@ -64,11 +64,6 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData, set
     });
   };
 
-  const handleBackToChoice = () => {
-    if (!setChoicedPin) return;
-    setChoicedPin(null);
-  };
-
   return (
     <StyledMapServices choicedPin={choicedPin ?? 'LIFE'}>
       <button
@@ -85,7 +80,7 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData, set
           <button className={'selectPos'} onClick={handleWritingNextStep}>
             이 위치로 핀 찍기
           </button>
-          <button className={'cancel'} onClick={handleBackToChoice}>
+          <button className={'cancel'} onClick={() => router.back()}>
             취소하기
           </button>
         </>
