@@ -56,7 +56,7 @@ const ComplainDetail: React.FC = () => {
       name: '최윤석',
       img: '',
       date: '2022-09-01',
-      body: '개추입니다.',
+      body: '저도 공감합니다.',
     },
   ];
 
@@ -88,6 +88,16 @@ const ComplainDetail: React.FC = () => {
 
   const handleEmotionBox = () => {
     setIsEmotionBoxOpen(!isEmotionBoxOpen);
+  };
+
+  const handleEmotionSubmit = async (emotion: Emotion) => {
+    const body = {
+      complaintId: id,
+      type: emotion,
+    };
+    await myAxios('post', 'api/v1/expression', body, true, accessToken);
+    setIsEmotionBoxOpen(false);
+    getDetailData();
   };
 
   useEffect(() => {
@@ -170,19 +180,19 @@ const ComplainDetail: React.FC = () => {
             <div>
               {isEmotionBoxOpen && (
                 <div>
-                  <button>
+                  <button onClick={() => handleEmotionSubmit('GOOD')}>
                     <div>
                       <BigGood fill={'#000'} />
                     </div>
                     <p>좋아요</p>
                   </button>
-                  <button>
+                  <button onClick={() => handleEmotionSubmit('BAD')}>
                     <div>
                       <BigBad fill={'#000'} />
                     </div>
                     <p>화나요</p>
                   </button>
-                  <button>
+                  <button onClick={() => handleEmotionSubmit('AMAZING')}>
                     <div>
                       <BigAmazing fill={'#000'} />
                     </div>
@@ -199,7 +209,7 @@ const ComplainDetail: React.FC = () => {
                 </button>
               )}
               {myEmotion === 'GOOD' && (
-                <button>
+                <button onClick={handleEmotionBox}>
                   <div>
                     <BigGood fill={'#F5564E'} />
                   </div>
@@ -207,7 +217,7 @@ const ComplainDetail: React.FC = () => {
                 </button>
               )}
               {myEmotion === 'BAD' && (
-                <button>
+                <button onClick={handleEmotionBox}>
                   <div>
                     <BigBad fill={'#F5564E'} />
                   </div>
@@ -215,7 +225,7 @@ const ComplainDetail: React.FC = () => {
                 </button>
               )}
               {myEmotion === 'AMAZING' && (
-                <button>
+                <button onClick={handleEmotionBox}>
                   <div>
                     <BigAmazing fill={'#F5564E'} />
                   </div>

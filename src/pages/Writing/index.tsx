@@ -472,6 +472,7 @@ const StyledWritingPage = styled(StyledPage)<StyledWritingPageProps>`
         border: none;
         filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.25));
         border-radius: 5px;
+        cursor: pointer;
       }
       & .filebox label {
         display: inline-block;

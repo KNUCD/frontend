@@ -12,9 +12,13 @@ const Checker: React.FC = () => {
   const router = useRouter();
 
   const checkLogin = async () => {
-    const res = await myAxios('post', 'api/v1/auth/account-token', null, true);
-    setAccessToken(res.data.response.accessToken);
-    setIsReady(true);
+    try {
+      const res = await myAxios('post', 'api/v1/auth/account-token', null, true);
+      setAccessToken(res.data.response.accessToken);
+    } catch (e) {
+    } finally {
+      setIsReady(true);
+    }
   };
 
   useEffect(() => {
@@ -47,15 +51,15 @@ const Checker: React.FC = () => {
   useEffect(() => {
     if (!isReady) return;
     if (accessToken === '') {
-      if (router.asPath !== '/' && router.asPath !== '/map') {
+      if (router.pathname !== '/' && router.pathname !== '/map') {
         router.push('/');
       }
     } else {
-      if (router.asPath !== '/' && router.asPath !== '/map' && router.asPath !== '/writing') {
+      if (router.pathname !== '/' && router.pathname !== '/map' && router.pathname !== '/writing') {
         router.push('/');
       }
     }
-  }, [isReady, router.asPath, accessToken]);
+  }, [isReady, router.pathname, accessToken]);
 
   return <></>;
 };
