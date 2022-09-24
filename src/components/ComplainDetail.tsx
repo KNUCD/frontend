@@ -6,16 +6,19 @@ import Back from '/public/back.svg';
 import Good from '/public/good.svg';
 import Bad from '/public/bad.svg';
 import Amazing from '/public/amazing.svg';
+import BigGood from '/public/bigGood.svg';
+import BigBad from '/public/bigBad.svg';
+import BigAmazing from '/public/bigAmazing.svg';
 import OptionalPin from '/public/optionalPin.svg';
 import Option from '/public/option.svg';
 import Heart from '/public/heart.svg';
 import CommentIcon from '/public/comment.svg';
 import Share from '/public/share.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { closeAtom, detailAtom } from 'others/stateStore';
+import { accessTokenAtom, closeAtom, detailAtom, isReadyAtom } from 'others/stateStore';
 import myAxios from 'others/myAxios';
 import { colorByCategory, getDayOfWeek } from 'constants/default';
-import { Category } from 'others/IntegrateInterfaces';
+import { Category, Emotion } from 'others/IntegrateInterfaces';
 import Image from 'next/image';
 
 interface detailDataProps {
@@ -32,6 +35,15 @@ const ComplainDetail: React.FC = () => {
   const { isClosed } = closeData;
   const { id } = useRecoilValue(detailAtom);
   const [detailData, setDetailData] = useState<detailDataProps>();
+  const isReady = useRecoilValue(isReadyAtom);
+  const [emotionData, setEmotionData] = useState({
+    amazingCount: 0,
+    badCount: 0,
+    goodCount: 0,
+  });
+  const [myEmotion, setMyEmotion] = useState<Emotion | null>(null);
+  const accessToken = useRecoilValue(accessTokenAtom);
+  const [isEmotionBoxOpen, setIsEmotionBoxOpen] = useState(false);
 
   const comments = [
     {
@@ -57,6 +69,14 @@ const ComplainDetail: React.FC = () => {
   const getDetailData = async () => {
     const res = await myAxios('get', `api/v1/complaint/${id}`);
     setDetailData(res.data.response);
+
+    const emotionRes = await myAxios('get', `api/v1/expression/${id}`);
+    setEmotionData(emotionRes.data.response);
+
+    if (isReady) {
+      const myRes = await myAxios('get', `api/v1/expression/${id}/me`, undefined, true, accessToken);
+      setMyEmotion(myRes.data.response);
+    }
   };
 
   const goBackToList = () => {
@@ -66,9 +86,13 @@ const ComplainDetail: React.FC = () => {
     setCloseData(tempData);
   };
 
+  const handleEmotionBox = () => {
+    setIsEmotionBoxOpen(!isEmotionBoxOpen);
+  };
+
   useEffect(() => {
     getDetailData();
-  }, [id]);
+  }, [id, isReady]);
 
   return (
     <StyledComplainDetail isClosed={isClosed}>
@@ -103,19 +127,19 @@ const ComplainDetail: React.FC = () => {
                   <div>
                     <Good />
                   </div>
-                  <p>23</p>
+                  <p>{emotionData.goodCount}</p>
                 </div>
                 <div>
                   <div>
                     <Bad />
                   </div>
-                  <p>13</p>
+                  <p>{emotionData.badCount}</p>
                 </div>
                 <div>
                   <div>
                     <Amazing />
                   </div>
-                  <p>87</p>
+                  <p>{emotionData.amazingCount}</p>
                 </div>
               </div>
               <p>공유 23회</p>
@@ -144,12 +168,60 @@ const ComplainDetail: React.FC = () => {
           </div>
           <div className={'commentFooter'}>
             <div>
-              <button>
+              {isEmotionBoxOpen && (
                 <div>
-                  <Heart />
+                  <button>
+                    <div>
+                      <BigGood fill={'#000'} />
+                    </div>
+                    <p>좋아요</p>
+                  </button>
+                  <button>
+                    <div>
+                      <BigBad fill={'#000'} />
+                    </div>
+                    <p>화나요</p>
+                  </button>
+                  <button>
+                    <div>
+                      <BigAmazing fill={'#000'} />
+                    </div>
+                    <p>놀라워요</p>
+                  </button>
                 </div>
-                <p>감정 남기기</p>
-              </button>
+              )}
+              {!myEmotion && (
+                <button onClick={handleEmotionBox}>
+                  <div>
+                    <Heart />
+                  </div>
+                  <p>감정 남기기</p>
+                </button>
+              )}
+              {myEmotion === 'GOOD' && (
+                <button>
+                  <div>
+                    <BigGood fill={'#F5564E'} />
+                  </div>
+                  <p>좋아요</p>
+                </button>
+              )}
+              {myEmotion === 'BAD' && (
+                <button>
+                  <div>
+                    <BigBad fill={'#F5564E'} />
+                  </div>
+                  <p>화나요</p>
+                </button>
+              )}
+              {myEmotion === 'AMAZING' && (
+                <button>
+                  <div>
+                    <BigAmazing fill={'#F5564E'} />
+                  </div>
+                  <p>놀라워요</p>
+                </button>
+              )}
               <button>
                 <div>
                   <CommentIcon />
@@ -331,6 +403,38 @@ const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
       display: flex;
       justify-content: space-around;
       width: 100%;
+      & > div {
+        display: flex;
+        position: absolute;
+        justify-content: center;
+        top: -35px;
+        left: 41px;
+        width: 192px;
+        height: 50px;
+        background: #fff;
+        box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+        border-radius: 25px;
+        gap: 18px;
+        & > button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 30px;
+          height: 100%;
+          background: none;
+          outline: none;
+          border: none;
+          gap: 3px;
+          cursor: pointer;
+          & > p {
+            white-space: nowrap;
+            font-weight: 700;
+            font-size: 10px;
+            color: #bdbdbd;
+          }
+        }
+      }
       & > button {
         display: flex;
         align-items: center;

@@ -16,3 +16,5 @@ export const getDayOfWeek = (date: string) => {
   const dayOfWeek = week[new Date(date).getDay()];
   return dayOfWeek;
 };
+
+export const loginURL = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URL}&response_type=code`;

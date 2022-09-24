@@ -47,4 +47,14 @@ const listAtom = atom({
   },
 });
 
-export { geolocationAtom, realTimeAtom, closeAtom, detailAtom, listAtom };
+const accessTokenAtom = atom({
+  key: 'accessToken',
+  default: '',
+});
+
+const isReadyAtom = atom({
+  key: 'isReady',
+  default: false,
+});
+
+export { geolocationAtom, realTimeAtom, closeAtom, detailAtom, listAtom, accessTokenAtom, isReadyAtom };

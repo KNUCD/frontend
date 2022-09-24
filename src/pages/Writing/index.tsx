@@ -2,7 +2,7 @@ import MyMap from 'components/Map';
 import { StyledPage } from 'others/CommonStyles';
 import { Category } from 'others/IntegrateInterfaces';
 import myAxios from 'others/myAxios';
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import OptionalPin from '/public/optionalPin.svg';
 import { useRouter } from 'next/router';
@@ -11,10 +11,11 @@ import { colorByCategory } from 'constants/default';
 import Life from '/public/life.svg';
 import Security from '/public/security.svg';
 import Traffic from '/public/traffic.svg';
-import { useRecoilState } from 'recoil';
-import { closeAtom } from 'others/stateStore';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { accessTokenAtom, closeAtom } from 'others/stateStore';
 
 const WritingPage: React.FC = () => {
+  const [isFile, setIsFile] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [closeData, setCloseData] = useRecoilState(closeAtom);
   const [isAgree, setIsAgree] = useState(false);
@@ -24,6 +25,7 @@ const WritingPage: React.FC = () => {
     lng: number;
   } | null>(null);
   const router = useRouter();
+  const accessToken = useRecoilValue(accessTokenAtom);
 
   const handleWriting = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,7 +40,7 @@ const WritingPage: React.FC = () => {
       category: choicedPin,
       file: img.size === 0 ? undefined : data.get('img'),
     };
-    const res = await myAxios('post', 'api/v1/complaint', body, undefined, undefined, 'multipart/form-data');
+    await myAxios('post', 'api/v1/complaint', body, true, accessToken, 'multipart/form-data');
     const tempData = { ...closeData };
     tempData.isMapPage = true;
     setCloseData(tempData);
@@ -49,140 +51,159 @@ const WritingPage: React.FC = () => {
     setIsAgree(!isAgree);
   };
 
-  return (
-    <StyledWritingPage choicedPin={choicedPin ?? 'LIFE'}>
-      {posData ? (
-        <>
-          {choicedPin && (
-            <div className={'writing'}>
-              <StyledPreComplain choicedPin={choicedPin}>
-                <h2>민원 작성하기</h2>
+  const fileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    setIsFile(e.target.value ? true : false);
+  };
 
-                <div className={'category'}>
-                  <button className={`life${choicedPin === 'LIFE' ? '' : 'NonActive'}`}>
+  return (
+    <>
+      <StyledWritingPage choicedPin={choicedPin ?? 'LIFE'}>
+        {posData ? (
+          <>
+            {choicedPin && (
+              <div className={'writing'}>
+                <button className={'cancel'} onClick={() => router.back()}>
+                  취소하기
+                </button>
+                <StyledPreComplain choicedPin={choicedPin}>
+                  <h2>민원 작성하기</h2>
+
+                  <div className={'category'}>
+                    <button className={`life${choicedPin === 'LIFE' ? '' : 'NonActive'}`}>
+                      <div>
+                        <Life fill={choicedPin === 'LIFE' ? 'white' : colorByCategory['LIFE']} />
+                      </div>
+                      <p>생활불편</p>
+                    </button>
+                    <button className={`security${choicedPin === 'SECURITY' ? '' : 'NonActive'}`}>
+                      <div>
+                        <Security fill={choicedPin === 'SECURITY' ? 'white' : colorByCategory['SECURITY']} />
+                      </div>
+                      <p>사회안전</p>
+                    </button>
+                    <button className={`traffic${choicedPin === 'TRAFFIC' ? '' : 'NonActive'}`}>
+                      <div>
+                        <Traffic fill={choicedPin === 'TRAFFIC' ? 'white' : colorByCategory['TRAFFIC']} />
+                      </div>
+                      <p>교통불편</p>
+                    </button>
+                  </div>
+                  <div className={'map'}>
+                    <MyMap
+                      props={{
+                        path: 'writing',
+                        choicedPin,
+                        isWriting: true,
+                        posData,
+                      }}
+                    />
+                    {choicedPin && (
+                      <WritingConstMarker>
+                        <Pin fill={colorByCategory[choicedPin]} />
+                      </WritingConstMarker>
+                    )}
+                  </div>
+                  <h3>개인정보 수집 및 이용안내</h3>
+                  <textarea rows={9} readOnly>
+                    1. 수집 및 이용 목적 (개인정보보호법 제15조) 핀플레인은 관계법령 등에서 정하는 소관 업무의 수행을
+                    위하여 다음과 같이 개인정보를 수집 및 이용합니다.&#10;&#10;수집된 개인정보는 정해진 목적 이외의
+                    용도로는 이용되지 않습니다. ※ 관계법령 : 민원처리에 관한 법률 및 동법 시행령, 전자정부법 및 동법
+                    시행령 가. 민원, 제안, 질의, 신고 등 모든 시민의견 접수·처리·사후관리 서비스 신청에 포함된
+                    개인정보는 소관 업무수행을 위해 행정·공공기관에서 이용합니다. 나. 타 행정·공공기관 시스템 이용
+                    민원의 전자적 처리를 위해 내부적으로 타 시스템 연계 및 이용 시 개인정보를 이용합니다. 다. 핀플레인
+                    서비스 향상 및 정책평가를 위하여 접수된 민원은 관계법령에 따라 분석·평가 및 처리결과의 사후관리를
+                    시행합니다.
+                  </textarea>
+                  <div className={'agree'}>
+                    <input
+                      type="checkbox"
+                      id="agree"
+                      value={isAgree ? 'agree' : 'disagree'}
+                      onChange={handleCheckbox}
+                    ></input>
+                    <p>위 개인정보 수집 및 이용에 동의합니다</p>
+                  </div>
+                </StyledPreComplain>
+                {isAgree && (
+                  <form onSubmit={handleWriting} encType={'multipart/form-data'}>
+                    <label>제목</label>
+                    <input
+                      type={'text'}
+                      name={'title'}
+                      placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}
+                      required
+                    ></input>
+                    <label>내용</label>
+                    <textarea
+                      name={'content'}
+                      rows={12}
+                      placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}
+                      required
+                    ></textarea>
+                    <label>사진 첨부</label>
+                    <div className="filebox">
+                      <label htmlFor="file" className={isFile ? 'done' : ''}>{`${
+                        isFile ? '등록 완료' : '사진 추가하기'
+                      }`}</label>
+                      <input type={'file'} id="file" accept={'image/*'} name={'img'} onChange={fileUpload}></input>
+                    </div>
+                    <button type={'submit'} disabled={disabled}>
+                      이 위치로 핀 찍기
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {!choicedPin && (
+              <StyledSelectPin>
+                <p>작성하실 민원에 맞는 핀을 골라주세요</p>
+                <div>
+                  <button onClick={() => setChoicedPin('LIFE')}>
                     <div>
-                      <Life fill={choicedPin === 'LIFE' ? 'white' : colorByCategory['LIFE']} />
+                      <OptionalPin fill={'#F5564E'} width={'56'} height={'68'} />
                     </div>
                     <p>생활불편</p>
                   </button>
-                  <button className={`security${choicedPin === 'SECURITY' ? '' : 'NonActive'}`}>
+                  <button onClick={() => setChoicedPin('SECURITY')}>
                     <div>
-                      <Security fill={choicedPin === 'SECURITY' ? 'white' : colorByCategory['SECURITY']} />
+                      <OptionalPin fill={'#2E3192'} width={'56'} height={'68'} />
                     </div>
                     <p>사회안전</p>
                   </button>
-                  <button className={`traffic${choicedPin === 'TRAFFIC' ? '' : 'NonActive'}`}>
+                  <button onClick={() => setChoicedPin('TRAFFIC')}>
                     <div>
-                      <Traffic fill={choicedPin === 'TRAFFIC' ? 'white' : colorByCategory['TRAFFIC']} />
+                      <OptionalPin fill={'#662D91'} width={'56'} height={'68'} />
                     </div>
                     <p>교통불편</p>
                   </button>
                 </div>
-                <div className={'map'}>
-                  <MyMap
-                    props={{
-                      path: 'writing',
-                      choicedPin,
-                      isWriting: true,
-                      posData,
-                    }}
-                  />
-                  {choicedPin && (
-                    <WritingConstMarker>
-                      <Pin fill={colorByCategory[choicedPin]} />
-                    </WritingConstMarker>
-                  )}
-                </div>
-                <h3>개인정보 수집 및 이용안내</h3>
-                <textarea rows={9} readOnly>
-                  1. 수집 및 이용 목적 (개인정보보호법 제15조) 핀플레인은 관계법령 등에서 정하는 소관 업무의 수행을
-                  위하여 다음과 같이 개인정보를 수집 및 이용합니다.&#10;&#10;수집된 개인정보는 정해진 목적 이외의
-                  용도로는 이용되지 않습니다. ※ 관계법령 : 민원처리에 관한 법률 및 동법 시행령, 전자정부법 및 동법
-                  시행령 가. 민원, 제안, 질의, 신고 등 모든 시민의견 접수·처리·사후관리 서비스 신청에 포함된 개인정보는
-                  소관 업무수행을 위해 행정·공공기관에서 이용합니다. 나. 타 행정·공공기관 시스템 이용 민원의 전자적
-                  처리를 위해 내부적으로 타 시스템 연계 및 이용 시 개인정보를 이용합니다. 다. 핀플레인 서비스 향상 및
-                  정책평가를 위하여 접수된 민원은 관계법령에 따라 분석·평가 및 처리결과의 사후관리를 시행합니다.
-                </textarea>
-                <div className={'agree'}>
-                  <input
-                    type="checkbox"
-                    id="agree"
-                    value={isAgree ? 'agree' : 'disagree'}
-                    onChange={handleCheckbox}
-                  ></input>
-                  <p>위 개인정보 수집 및 이용에 동의합니다</p>
-                </div>
-              </StyledPreComplain>
-              {isAgree && (
-                <form onSubmit={handleWriting} encType={'multipart/form-data'}>
-                  <label>제목</label>
-                  <input
-                    type={'text'}
-                    name={'title'}
-                    placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}
-                    required
-                  ></input>
-                  <label>내용</label>
-                  <textarea
-                    name={'content'}
-                    rows={12}
-                    placeholder={'민원 내용을 잘 나타낼수 있는 언어를 사용해주세요'}
-                    required
-                  ></textarea>
-                  <label>사진 첨부</label>
-                  <input type={'file'} name={'img'}></input>
-                  <button type={'submit'} disabled={disabled}>
-                    이 위치로 핀 찍기
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-        </>
-      ) : (
-        <>
-          {!choicedPin && (
-            <StyledSelectPin>
-              <p>작성하실 민원에 맞는 핀을 골라주세요</p>
-              <div>
-                <button onClick={() => setChoicedPin('LIFE')}>
-                  <div>
-                    <OptionalPin fill={'#F5564E'} width={'56'} height={'68'} />
-                  </div>
-                  <p>생활불편</p>
-                </button>
-                <button onClick={() => setChoicedPin('SECURITY')}>
-                  <div>
-                    <OptionalPin fill={'#2E3192'} width={'56'} height={'68'} />
-                  </div>
-                  <p>사회안전</p>
-                </button>
-                <button onClick={() => setChoicedPin('TRAFFIC')}>
-                  <div>
-                    <OptionalPin fill={'#662D91'} width={'56'} height={'68'} />
-                  </div>
-                  <p>교통불편</p>
-                </button>
-              </div>
-              <button onClick={() => router.back()}>취소하기</button>
-            </StyledSelectPin>
-          )}
-          <MyMap
-            props={{
-              path: 'writing',
-              setPosData,
-              setChoicedPin,
-              choicedPin,
-            }}
-          />
-          {choicedPin && (
-            <ConstMarker>
-              <Pin fill={colorByCategory[choicedPin]} />
-            </ConstMarker>
-          )}
-        </>
-      )}
-    </StyledWritingPage>
+                <button onClick={() => router.back()}>취소하기</button>
+              </StyledSelectPin>
+            )}
+            <MyMap
+              props={{
+                path: 'writing',
+                setPosData,
+                setChoicedPin,
+                choicedPin,
+              }}
+            />
+            {choicedPin && (
+              <ConstMarker>
+                <Pin fill={colorByCategory[choicedPin]} />
+              </ConstMarker>
+            )}
+          </>
+        )}
+      </StyledWritingPage>
+
+      <StyledMobilePage>
+        <p>PC에서 이용해주세요</p>
+      </StyledMobilePage>
+    </>
   );
 };
 
@@ -384,6 +405,22 @@ const StyledWritingPage = styled(StyledPage)<StyledWritingPageProps>`
     display: flex;
     width: 100%;
     height: 100%;
+    & > .cancel {
+      position: fixed;
+      top: 24px;
+      right: 16px;
+      width: 124px;
+      height: 48px;
+      cursor: pointer;
+      filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.25));
+      border-radius: 5px;
+      background: #fff;
+      font-weight: 700;
+      font-size: 20px;
+      color: ${(props) => colorByCategory[props.choicedPin]};
+      outline: none;
+      border: none;
+    }
     & form {
       display: flex;
       flex-direction: column;
@@ -395,7 +432,8 @@ const StyledWritingPage = styled(StyledPage)<StyledWritingPageProps>`
       & > label,
       input,
       button,
-      textarea {
+      textarea,
+      > div {
         width: 100%;
         max-width: 485px;
       }
@@ -435,7 +473,46 @@ const StyledWritingPage = styled(StyledPage)<StyledWritingPageProps>`
         filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.25));
         border-radius: 5px;
       }
+      & .filebox label {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        padding: 0.5em 0.75em;
+        color: #999;
+        cursor: pointer;
+        background: #ffffff;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
+        border-radius: 3px;
+      }
+
+      & .done {
+        color: #333 !important;
+      }
+
+      & .filebox input[type='file'] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
     }
+  }
+
+  @media (max-width: 800px) {
+    display: none;
+  }
+`;
+
+const StyledMobilePage = styled(StyledPage)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  & > p {
+    font-size: 20px;
   }
 `;
 

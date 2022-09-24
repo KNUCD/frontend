@@ -5,13 +5,18 @@ import Good from '/public/good.svg';
 import Bad from '/public/bad.svg';
 import Amazing from '/public/amazing.svg';
 import Heart from '/public/heart.svg';
+import BigGood from '/public/bigGood.svg';
+import BigBad from '/public/bigBad.svg';
+import BigAmazing from '/public/bigAmazing.svg';
 import Comment from '/public/comment.svg';
 import Share from '/public/share.svg';
 import Image from 'next/image';
-import { Category } from 'others/IntegrateInterfaces';
+import { Category, Emotion } from 'others/IntegrateInterfaces';
 import { colorByCategory, getDayOfWeek } from 'constants/default';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { closeAtom, detailAtom } from 'others/stateStore';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { accessTokenAtom, closeAtom, detailAtom, isReadyAtom } from 'others/stateStore';
+import { useEffect, useState } from 'react';
+import myAxios from 'others/myAxios';
 
 interface ComplainProps {
   category: Category;
@@ -27,6 +32,14 @@ const Complain: React.FC<ComplainProps> = ({ category, content, createdDate, fil
   const processedCreatedDate = createdDate.substr(0, 10);
   const [closeData, setCloseData] = useRecoilState(closeAtom);
   const setDetailId = useSetRecoilState(detailAtom);
+  const [emotionData, setEmotionData] = useState({
+    amazingCount: 0,
+    badCount: 0,
+    goodCount: 0,
+  });
+  const [myEmotion, setMyEmotion] = useState<Emotion | null>(null);
+  const accessToken = useRecoilValue(accessTokenAtom);
+  const isReady = useRecoilValue(isReadyAtom);
 
   const handleDetail = () => {
     const tempData = { ...closeData };
@@ -37,6 +50,20 @@ const Complain: React.FC<ComplainProps> = ({ category, content, createdDate, fil
       id,
     });
   };
+
+  const getEmotion = async () => {
+    if (isReady) {
+      const res = await myAxios('get', `api/v1/expression/${id}`);
+      setEmotionData(res.data.response);
+
+      const myRes = await myAxios('get', `api/v1/expression/${id}/me`, undefined, true, accessToken);
+      setMyEmotion(myRes.data.response);
+    }
+  };
+
+  useEffect(() => {
+    getEmotion();
+  }, [isReady]);
 
   return (
     <StyledComplain onClick={handleDetail}>
@@ -76,19 +103,19 @@ const Complain: React.FC<ComplainProps> = ({ category, content, createdDate, fil
               <div>
                 <Good />
               </div>
-              <p>23</p>
+              <p>{emotionData.goodCount}</p>
             </div>
             <div>
               <div>
                 <Bad />
               </div>
-              <p>13</p>
+              <p>{emotionData.badCount}</p>
             </div>
             <div>
               <div>
                 <Amazing />
               </div>
-              <p>87</p>
+              <p>{emotionData.amazingCount}</p>
             </div>
           </div>
           <p>공유 23회</p>
@@ -96,12 +123,38 @@ const Complain: React.FC<ComplainProps> = ({ category, content, createdDate, fil
       </div>
 
       <div className={'footer'}>
-        <button>
-          <div>
-            <Heart />
-          </div>
-          <p>감정 남기기</p>
-        </button>
+        {!myEmotion && (
+          <button>
+            <div>
+              <Heart />
+            </div>
+            <p>감정 남기기</p>
+          </button>
+        )}
+        {myEmotion === 'GOOD' && (
+          <button>
+            <div>
+              <BigGood fill={'#F5564E'} />
+            </div>
+            <p>좋아요</p>
+          </button>
+        )}
+        {myEmotion === 'BAD' && (
+          <button>
+            <div>
+              <BigBad fill={'#F5564E'} />
+            </div>
+            <p>화나요</p>
+          </button>
+        )}
+        {myEmotion === 'AMAZING' && (
+          <button>
+            <div>
+              <BigAmazing fill={'#F5564E'} />
+            </div>
+            <p>놀라워요</p>
+          </button>
+        )}
         <button>
           <div>
             <Comment />
