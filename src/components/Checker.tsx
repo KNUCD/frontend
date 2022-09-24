@@ -1,5 +1,5 @@
 import myAxios from 'others/myAxios';
-import { accessTokenAtom, geolocationAtom } from 'others/stateStore';
+import { accessTokenAtom, geolocationAtom, isReadyAtom } from 'others/stateStore';
 import { useEffect, useState } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import useInterval from 'use-interval';
@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 const Checker: React.FC = () => {
   const setGeolocationData = useSetRecoilState(geolocationAtom);
   const [accessToken, setAccessToken] = useRecoilState(accessTokenAtom);
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useRecoilState(isReadyAtom);
   const router = useRouter();
 
   const checkLogin = async () => {

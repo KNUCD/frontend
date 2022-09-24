@@ -52,4 +52,9 @@ const accessTokenAtom = atom({
   default: '',
 });
 
-export { geolocationAtom, realTimeAtom, closeAtom, detailAtom, listAtom, accessTokenAtom };
+const isReadyAtom = atom({
+  key: 'isReady',
+  default: false,
+});
+
+export { geolocationAtom, realTimeAtom, closeAtom, detailAtom, listAtom, accessTokenAtom, isReadyAtom };

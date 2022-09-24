@@ -118,6 +118,9 @@ const StyledNav = styled.div`
   & .icon {
     cursor: inherit;
   }
+
+  @media (max-width: 600px) {
+  }
 `;
 
 export default Nav;

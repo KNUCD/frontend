@@ -49,7 +49,7 @@ const HomePage: React.FC = () => {
           <Link href={'/writing'} passHref>
             <StyledLink className={'writing'} onClick={handleCloseData}>
               <div>
-                <Pencil />
+                <Pencil fill={'white'} />
               </div>
               <p>민원 작성하기</p>
             </StyledLink>
