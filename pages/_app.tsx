@@ -28,6 +28,11 @@ function MyApp({ Component, pageProps }: AppProps) {
             content="https://avatars.githubusercontent.com/u/113536307?s=400&u=d97cf2f4647d904a1cfcd14cac0f92bc65b705e6&v=4"
           />
           <link rel="shortcut icon" type="image/x-icon" href="/pinplain.png" />
+          <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
+          />
         </Head>
         <Checker />
         <Nav />
