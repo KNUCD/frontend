@@ -5,8 +5,18 @@ import main2 from '../../../public/main2.png';
 import styled from 'styled-components';
 import Pencil from '/public/pencil.svg';
 import Link from 'next/link';
+import { useRecoilState } from 'recoil';
+import { closeAtom } from 'others/stateStore';
 
 const HomePage: React.FC = () => {
+  const [closeData, setCloseData] = useRecoilState(closeAtom);
+
+  const handleCloseData = () => {
+    const tempData = { ...closeData };
+    tempData.isMapPage = false;
+    setCloseData(tempData);
+  };
+
   return (
     <StyledHomePage>
       <div>
@@ -25,7 +35,7 @@ const HomePage: React.FC = () => {
         </p>
         <div>
           <Link href={'/writing'} passHref>
-            <StyledLink className={'writing'}>
+            <StyledLink className={'writing'} onClick={handleCloseData}>
               <div>
                 <Pencil />
               </div>

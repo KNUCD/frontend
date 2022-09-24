@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router';
 import { RefObject, Ref, Dispatch, SetStateAction } from 'react';
-import { geolocationAtom, realTimeAtom } from 'others/stateStore';
+import { closeAtom, geolocationAtom, realTimeAtom } from 'others/stateStore';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
-import { defaultPos } from 'constants/default';
-import { Path } from 'others/IntegrateInterfaces';
+import { colorByCategory, defaultPos } from '../constants/default';
+import { Category, Path } from 'others/IntegrateInterfaces';
 
 interface MapServicesProps {
   mapRef: RefObject<kakao.maps.Map>;
@@ -15,9 +15,12 @@ interface MapServicesProps {
       lng: number;
     } | null>
   >;
+  setChoicedPin?: Dispatch<SetStateAction<Category | null>>;
+  choicedPin: Category | null;
 }
 
-const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData }) => {
+const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData, setChoicedPin, choicedPin }) => {
+  const [closeData, setCloseData] = useRecoilState(closeAtom);
   const router = useRouter();
   const myPos = useRecoilValue(geolocationAtom);
   const [realTimeData, setRealTimeData] = useRecoilState(realTimeAtom);
@@ -40,6 +43,10 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData }) =
   };
 
   const directToWritingPage = () => {
+    const tempData = { ...closeData };
+    tempData.isMapPage = false;
+    setCloseData(tempData);
+
     if (!isRealTime) {
       const map = mapRef.current;
       setRealTimeData({
@@ -63,7 +70,7 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData }) =
   };
 
   return (
-    <StyledMapServices>
+    <StyledMapServices choicedPin={choicedPin ?? 'LIFE'}>
       <button
         className={`realTimeBtn ${isRealTime ? 'realTime' : 'nonRealTime'}`}
         onClick={handleRealTimeValue}
@@ -73,16 +80,25 @@ const MapServices: React.FC<MapServicesProps> = ({ mapRef, path, setPosData }) =
           민원 넣기
         </button>
       )}
-      {path === 'writing' && (
-        <button className={'complainPosBtn'} onClick={handleWritingNextStep}>
-          이 위치에 민원 넣기
-        </button>
+      {path === 'writing' && choicedPin && (
+        <>
+          <button className={'selectPos'} onClick={handleWritingNextStep}>
+            이 위치로 핀 찍기
+          </button>
+          <button className={'cancel'} onClick={() => router.back()}>
+            취소하기
+          </button>
+        </>
       )}
     </StyledMapServices>
   );
 };
 
-const StyledMapServices = styled.div`
+interface StyledMapServicesProps {
+  choicedPin: Category;
+}
+
+const StyledMapServices = styled.div<StyledMapServicesProps>`
   position: absolute;
   top: 0;
   left: 0;
@@ -114,16 +130,36 @@ const StyledMapServices = styled.div`
     width: 50px;
     height: 50px;
   }
-  & .complainPosBtn {
-    position: fixed;
-    bottom: 40px;
-    left: calc(50% - 200px);
-    width: 400px;
-    height: 40px;
-    background: #ffd800;
+
+  & .selectPos {
+    position: absolute;
+    right: 180px;
+    bottom: 30px;
+    width: 278px;
+    height: 48px;
+    background: ${(props) => colorByCategory[props.choicedPin]};
+    color: #fff;
+    filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.25));
+    border-radius: 5px;
+    font-weight: 700;
+    font-size: 20px;
+  }
+
+  & .cancel {
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    width: 124px;
+    height: 48px;
+    background: #fff;
     outline: none;
     border: none;
     z-index: 2;
+    filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.25));
+    border-radius: 5px;
+    color: ${(props) => colorByCategory[props.choicedPin]};
+    font-weight: 700;
+    font-size: 20px;
   }
 `;
 

@@ -2,24 +2,49 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import GoBack from '/public/goBack.svg';
 import GoFront from '/public/goFront.svg';
-import { useRecoilState } from 'recoil';
-import { closeAtom } from 'others/stateStore';
+import Back from '/public/back.svg';
+import Good from '/public/good.svg';
+import Bad from '/public/bad.svg';
+import Amazing from '/public/amazing.svg';
+import OptionalPin from '/public/optionalPin.svg';
+import Option from '/public/option.svg';
+import Heart from '/public/heart.svg';
+import CommentIcon from '/public/comment.svg';
+import Share from '/public/share.svg';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { closeAtom, detailAtom } from 'others/stateStore';
+import myAxios from 'others/myAxios';
+import { colorByCategory, getDayOfWeek } from 'constants/default';
+import { Category } from 'others/IntegrateInterfaces';
+import Image from 'next/image';
+
+interface detailDataProps {
+  category: Category;
+  content: string;
+  createdDate: string;
+  file: string | null;
+  title: string;
+  writerName: string;
+}
 
 const ComplainDetail: React.FC = () => {
   const [closeData, setCloseData] = useRecoilState(closeAtom);
   const { isClosed } = closeData;
+  const { id } = useRecoilValue(detailAtom);
+  const [detailData, setDetailData] = useState<detailDataProps>();
+
   const comments = [
     {
       name: '곽나영',
-      body: '지나갈 때마다 냄새가 너무 납니다. 게시판을 설치하거나 계단과 같이 입주민들이 주로 볼 수 있는 곳에 인식개선에 관련된 홍보물을 부착하시는 건 어떨까요?',
+      img: '',
+      date: '2022-09-01',
+      body: '공감합니다. 너무 좋은 해결책이네요',
     },
     {
-      name: '곽나영',
-      body: '지나갈 때마다 냄새가 너무 납니다. 게시판을 설치하거나 계단과 같이 입주민들이 주로 볼 수 있는 곳에 인식개선에 관련된 홍보물을 부착하시는 건 어떨까요?',
-    },
-    {
-      name: '곽나영',
-      body: '지나갈 때마다 냄새가 너무 납니다. 게시판을 설치하거나 계단과 같이 입주민들이 주로 볼 수 있는 곳에 인식개선에 관련된 홍보물을 부착하시는 건 어떨까요?',
+      name: '최윤석',
+      img: '',
+      date: '2022-09-01',
+      body: '개추입니다.',
     },
   ];
 
@@ -29,63 +54,122 @@ const ComplainDetail: React.FC = () => {
     setCloseData(tempData);
   };
 
-  useEffect(() => {
+  const getDetailData = async () => {
+    const res = await myAxios('get', `api/v1/complaint/${id}`);
+    setDetailData(res.data.response);
+  };
+
+  const goBackToList = () => {
     const tempData = { ...closeData };
-    tempData.isMapPage = true;
-    tempData.isList = false;
+    tempData.isClosed = false;
+    tempData.isList = true;
     setCloseData(tempData);
-  }, []);
+  };
+
+  useEffect(() => {
+    getDetailData();
+  }, [id]);
 
   return (
     <StyledComplainDetail isClosed={isClosed}>
       <div className={'header'}>
-        <div></div>
-        <div></div>
-      </div>
-      <div className={'detail'}>
-        <div className={'img'}></div>
-        <div className={'title'}>쓰레기 불법투기 문제 개선방안 건의합니다!</div>
-        <div className={'body'}>
-          지나갈 때마다 냄새가 너무 납니다. 게시판을 설치하거나 계단과 같이 입주민들이 주로 볼 수 있는 곳에 인식개선에
-          관련된 홍보물을 부착하시는 건 어떨까요?
+        <div className={'back'} onClick={goBackToList}>
+          <Back />
+        </div>
+        <div>
+          {detailData && <OptionalPin width={'21px'} height={'25px'} fill={colorByCategory[detailData.category]} />}
         </div>
       </div>
-      <div className={'subHeader'}>
-        <div className={'img'}></div>
-        <div className={'texts'}>
+
+      {detailData && (
+        <div className={'slide'}>
           <div className={'profile'}>
-            <h3>곽나영</h3>
-            <p>열정적인 활동가</p>
+            <div className={'img'}></div>
+            <div className={'texts'}>
+              <h3>{detailData.writerName}</h3>
+              <p>{`${detailData.createdDate.substr(0, 10)} ${getDayOfWeek(detailData.createdDate.substr(0, 10))}`}</p>
+            </div>
           </div>
-          <div className={'date'}>
-            <h3>건의 날짜</h3>
-            <p>2022-09-21 수</p>
+
+          <div className={'detail'}>
+            <div className={'title'}>{detailData.title}</div>
+            <div className={'body'}>{detailData.content}</div>
+            {detailData && detailData.file && (
+              <Image src={detailData.file} width="100%" height="100%" layout="responsive" objectFit="contain" />
+            )}
+            <div className={'interaction'}>
+              <div>
+                <div>
+                  <div>
+                    <Good />
+                  </div>
+                  <p>23</p>
+                </div>
+                <div>
+                  <div>
+                    <Bad />
+                  </div>
+                  <p>13</p>
+                </div>
+                <div>
+                  <div>
+                    <Amazing />
+                  </div>
+                  <p>87</p>
+                </div>
+              </div>
+              <p>공유 23회</p>
+            </div>
+            <div className={'grey'}></div>
           </div>
-          <div className={'state'}>
-            <h3>답변 상태</h3>
-            <p>검토 중</p>
+
+          <div className={'comments'}>
+            {comments.map(({ name, body, date }, index) => {
+              return (
+                <Comment key={index}>
+                  <div className={'profile'}>
+                    <div className={'img'}></div>
+                    <div className={'texts'}>
+                      <h3>{name}</h3>
+                      <p>{date}</p>
+                    </div>
+                  </div>
+                  <p>{body}</p>
+                  <div className={'option'}>
+                    <Option />
+                  </div>
+                </Comment>
+              );
+            })}
+          </div>
+          <div className={'commentFooter'}>
+            <div>
+              <button>
+                <div>
+                  <Heart />
+                </div>
+                <p>감정 남기기</p>
+              </button>
+              <button>
+                <div>
+                  <CommentIcon />
+                </div>
+                <p>댓글 9</p>
+              </button>
+              <button>
+                <div>
+                  <Share />
+                </div>
+                <p>공유하기</p>
+              </button>
+            </div>
+            <input type={'text'} placeholder={'댓글을 입력해주세요'}></input>
+          </div>
+          <div className={'close'} onClick={handleClose}>
+            {isClosed ? <GoFront /> : <GoBack />}
           </div>
         </div>
-      </div>
-      <div className={'empathy'}></div>
-      <div className={'comments'}>
-        {comments.map(({ name, body }, index) => {
-          return (
-            <Comment key={index}>
-              <h3>{name}</h3>
-              <p>{body}</p>
-              <h4>답글달기</h4>
-            </Comment>
-          );
-        })}
-      </div>
-      <div className={'commentForm'}>
-        <div className={'input'}></div>
-        <div className={'emotion'}></div>
-      </div>
-      <div className={'close'} onClick={handleClose}>
-        {isClosed ? <GoFront /> : <GoBack />}
-      </div>
+      )}
     </StyledComplainDetail>
   );
 };
@@ -110,15 +194,52 @@ const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
     display: flex;
     justify-content: space-between;
     width: 100%;
-    height: 110px;
     & > div {
-      margin: 21px 31px;
-      width: 45px;
-      height: 45px;
-      background: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+    }
+    & .back {
+      cursor: pointer;
     }
   }
-  & > .detail {
+
+  & .slide {
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+  }
+  & .profile {
+    display: flex;
+    gap: 7px;
+    padding-left: 24px;
+    margin-bottom: 20px;
+    & .img {
+      width: 40px;
+      height: 40px;
+      background: #ddd;
+      border-radius: 100%;
+    }
+    & .texts {
+      display: flex;
+      flex-direction: column;
+      padding: 2px;
+      gap: 3px;
+      & h3 {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      & p {
+        font-weight: 500;
+        font-size: 14px;
+        color: #828282;
+      }
+    }
+  }
+
+  & .detail {
     width: 100%;
     & > div {
       width: 100%;
@@ -129,83 +250,124 @@ const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
       background: #aaa;
     }
     & .title {
-      padding: 20px 30px 0 30px;
+      word-break: break-all;
       font-weight: 700;
-      font-size: 20px;
+      font-size: 24px;
+      padding: 0 50px 0 25px;
+      margin-bottom: 20px;
     }
     & .body {
-      padding: 13px 30px 30px 30px;
+      word-break: break-all;
+      width: 100%;
       font-weight: 400;
       font-size: 14px;
+      padding: 0 50px 0 25px;
+      margin-bottom: 22px;
     }
-  }
-  & > .subHeader {
-    display: flex;
-    width: 100%;
-    height: 50px;
-    gap: 12px;
-    padding: 0 30px;
-    margin-bottom: 40px;
-    & .img {
-      width: 52px;
-      min-width: 52px;
-      height: 50px;
-      background: #ddd;
-      border-radius: 100%;
-    }
-    & .texts {
+    & .interaction {
       display: flex;
-      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      height: 30px;
+      padding: 0 15px 0 6px;
       & > div {
         display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        width: 100%;
-        height: 100%;
-        padding: 5px;
-        & h3 {
-          font-weight: 700;
-          font-size: 13px;
-        }
-        & p {
-          font-weight: 400;
-          font-size: 12px;
+        gap: 5px;
+        & > div {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 18px;
+          padding: 2px 3px 2px 5px;
+          background: #f2f2f2;
+          border-radius: 9px;
+          gap: 4px;
+          & > div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+          & > p {
+            font-weight: 300;
+            font-size: 11px;
+          }
         }
       }
+      & > p {
+        font-weight: 500;
+        font-size: 11px;
+        color: #333;
+      }
+    }
+
+    & .grey {
+      width: 100%;
+      height: 6px;
+      background: #f2f2f2;
     }
   }
-  & > .empathy {
-    width: 100%;
-    min-height: 70px;
-    background: #eee;
-    margin-bottom: 20px;
-  }
-  & > .comments {
+
+  & .comments {
     display: flex;
     flex-direction: column;
     width: 100%;
+    margin-bottom: 160px;
   }
-  & > .commentForm {
+  & .commentFooter {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    position: sticky;
+    flex-direction: column;
+    justify-content: space-around;
+    position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    min-height: 70px;
+    height: 140px;
     z-index: 2;
-    gap: 17px;
-    background: #efefef;
-    & .input {
-      width: 344px;
-      height: 45px;
-      background: #ccc;
+    background: #f3f4f7;
+    box-shadow: 0px -4px 21px rgba(0, 0, 0, 0.25);
+    padding-bottom: 10px;
+
+    & > div {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      & > button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 120px;
+        height: 50px;
+        border: none;
+        background: none;
+        outline: none;
+        cursor: pointer;
+        & > div {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 50px;
+          height: 50px;
+        }
+        & > p {
+          font-weight: 500;
+          font-size: 12px;
+          color: #828282;
+        }
+      }
     }
-    & .emotion {
-      width: 45px;
-      height: 45px;
-      background: #ccc;
+    & > input {
+      background: #ffffff;
+      border: 1px solid #bdbdbd;
+      border-radius: 45px;
+      padding: 16px 27px;
+      font-weight: 500;
+      font-size: 16px;
+      margin: 0 16px;
+      ::placeholder {
+        font-weight: 600;
+        font-size: 16px;
+        color: #4f4f4f;
+      }
     }
   }
   & .close {
@@ -228,21 +390,51 @@ const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
 const Comment = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 10px 30px;
-  & h3 {
-    font-weight: 700;
-    font-size: 13px;
-    margin-bottom: 7px;
+  position: relative;
+  padding: 20px 20px 0 20px;
+  & .profile {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 14px;
+    & .img {
+      width: 40px;
+      height: 40px;
+      background: #ddd;
+      border-radius: 100%;
+    }
+    & .texts {
+      display: flex;
+      flex-direction: column;
+      padding: 2px;
+      gap: 3px;
+      & h3 {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      & p {
+        font-weight: 500;
+        font-size: 14px;
+        color: #828282;
+      }
+    }
   }
-  & p {
+
+  & > p {
+    padding: 0 22px 0 48px;
     font-weight: 400;
     font-size: 14px;
+    margin-bottom: 4px;
   }
-  & h4 {
-    position: relative;
-    font-weight: 400;
-    font-size: 12px;
-    text-align: right;
+
+  & .option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 12px;
+    right: 0;
+    width: 40px;
+    height: 40px;
   }
 `;
 

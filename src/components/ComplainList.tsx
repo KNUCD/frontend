@@ -9,16 +9,37 @@ import GoBack from '/public/goBack.svg';
 import GoFront from '/public/goFront.svg';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { closeAtom } from 'others/stateStore';
+import { closeAtom, listAtom } from 'others/stateStore';
+import myAxios from 'others/myAxios';
+import { Category } from 'others/IntegrateInterfaces';
+import { colorByCategory } from 'constants/default';
 
 const ComplainList: React.FC = () => {
   const [closeData, setCloseData] = useRecoilState(closeAtom);
+  const [complains, setComplains] = useState([]);
   const { isClosed } = closeData;
+  const [listData, setListData] = useRecoilState(listAtom);
 
   const handleClose = () => {
     const tempData = { ...closeData };
     tempData.isClosed = !closeData.isClosed;
     setCloseData(tempData);
+  };
+
+  const getComplainList = async () => {
+    const { category, ha, qa, oa, pa } = listData;
+    const res = await myAxios('get', `api/v1/complaint?category=${category}&ha=${ha}&qa=${qa}&oa=${oa}&pa=${pa}`);
+    setComplains(res.data.response);
+  };
+
+  const handleCategory = (category: Category) => {
+    const tempListData = { ...listData };
+    if (tempListData.category === category) {
+      tempListData.category = 'ALL';
+    } else {
+      tempListData.category = category;
+    }
+    setListData(tempListData);
   };
 
   useEffect(() => {
@@ -28,9 +49,13 @@ const ComplainList: React.FC = () => {
     setCloseData(tempData);
   }, []);
 
+  useEffect(() => {
+    getComplainList();
+  }, [listData]);
+
   return (
     <StyledComplainList isClosed={isClosed}>
-      <ComplainListHeader>
+      <ComplainListHeader category={listData.category}>
         <div className={'upper'}>
           <p>민원 꾸러미</p>
           <div>
@@ -44,30 +69,63 @@ const ComplainList: React.FC = () => {
           </div>
         </div>
         <div className={'category'}>
-          <button className={'life'}>
+          <button
+            className={`life${listData.category === 'LIFE' || listData.category === 'ALL' ? '' : 'NonActive'}`}
+            onClick={() => handleCategory('LIFE')}
+          >
             <div>
-              <Life />
+              <Life
+                fill={listData.category === 'LIFE' || listData.category === 'ALL' ? 'white' : colorByCategory['LIFE']}
+              />
             </div>
             <p>생활불편</p>
           </button>
-          <button className={'security'}>
+          <button
+            className={`security${listData.category === 'SECURITY' || listData.category === 'ALL' ? '' : 'NonActive'}`}
+            onClick={() => handleCategory('SECURITY')}
+          >
             <div>
-              <Security />
+              <Security
+                fill={
+                  listData.category === 'SECURITY' || listData.category === 'ALL'
+                    ? 'white'
+                    : colorByCategory['SECURITY']
+                }
+              />
             </div>
             <p>사회안전</p>
           </button>
-          <button className={'traffic'}>
+          <button
+            className={`traffic${listData.category === 'TRAFFIC' || listData.category === 'ALL' ? '' : 'NonActive'}`}
+            onClick={() => handleCategory('TRAFFIC')}
+          >
             <div>
-              <Traffic />
+              <Traffic
+                fill={
+                  listData.category === 'TRAFFIC' || listData.category === 'ALL' ? 'white' : colorByCategory['TRAFFIC']
+                }
+              />
             </div>
             <p>교통불편</p>
           </button>
         </div>
       </ComplainListHeader>
       <Complains>
-        <Complain></Complain>
-        <Complain></Complain>
-        <Complain></Complain>
+        {complains.map((complain, index) => {
+          const { category, content, createdDate, file, id, title, writerName } = complain;
+          return (
+            <Complain
+              key={index}
+              category={category}
+              content={content}
+              createdDate={createdDate}
+              file={file}
+              id={id}
+              title={title}
+              writerName={writerName}
+            ></Complain>
+          );
+        })}
       </Complains>
       <div className={'close'} onClick={handleClose}>
         {isClosed ? <GoFront /> : <GoBack />}
@@ -99,6 +157,7 @@ const StyledComplainList = styled.div<StyledComplainListProps>`
   z-index: 2;
   transform: ${(props) => (props.isClosed ? 'translateX(-100%)' : 'translateX(0)')};
   transition: 1s;
+  background: #fff;
   & .close {
     display: flex;
     justify-content: center;
@@ -116,7 +175,11 @@ const StyledComplainList = styled.div<StyledComplainListProps>`
   }
 `;
 
-const ComplainListHeader = styled.div`
+interface ComplainListHeaderProps {
+  category: string;
+}
+
+const ComplainListHeader = styled.div<ComplainListHeaderProps>`
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -192,11 +255,35 @@ const ComplainListHeader = styled.div`
     & .life {
       background: #f5564e;
     }
+    & .lifeNonActive {
+      background: #fff;
+      border: 1px solid #f5564e;
+      border-radius: 3px;
+      & > p {
+        color: #f5564e;
+      }
+    }
     & .security {
       background: #2e3192;
     }
+    & .securityNonActive {
+      background: #fff;
+      border: 1px solid #2e3192;
+      border-radius: 3px;
+      & > p {
+        color: #2e3192;
+      }
+    }
     & .traffic {
       background: #662d91;
+    }
+    & .trafficNonActive {
+      background: #fff;
+      border: 1px solid #662d91;
+      border-radius: 3px;
+      & > p {
+        color: #662d91;
+      }
     }
   }
 `;
