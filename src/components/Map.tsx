@@ -158,9 +158,9 @@ const MyMap: React.FC<MyMapProps> = ({
                     {
                       width: '32px',
                       height: '40px',
-                      background: 'url("/cluster.svg")',
+                      background: `url("/${clusterSVGByCategory[listData.category]}.svg")`,
                       paddingTop: '3px',
-                      color: '#fff',
+                      color: `${listData.category === 'ALL' ? '#000' : '#fff'}`,
                       textAlign: 'center',
                       fontWeight: 'bold',
                       lineHeight: '31px',
@@ -203,6 +203,13 @@ const MyMap: React.FC<MyMapProps> = ({
       )}
     </>
   );
+};
+
+const clusterSVGByCategory: Obj<string> = {
+  ALL: 'integrationCluster',
+  LIFE: 'lifeCluster',
+  SECURITY: 'securityCluster',
+  TRAFFIC: 'trafficCluster',
 };
 
 interface StyledMapProps {
