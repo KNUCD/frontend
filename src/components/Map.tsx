@@ -247,7 +247,7 @@ const StyledMap = styled.div<StyledMapProps>`
   @media (max-width: 600px) {
     left: 0;
     width: 100%;
-    height: 100%;
+    height: ${(props) => (props.isWriting ? '250px' : '100%')};
   }
 `;
 
