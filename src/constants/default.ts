@@ -17,4 +17,10 @@ export const getDayOfWeek = (date: string) => {
   return dayOfWeek;
 };
 
+export const convertToHttps = (url: string) => {
+  if (url.includes('https')) return url;
+  const res = url.replace('http', 'https');
+  return res;
+};
+
 export const loginURL = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URL}&response_type=code`;

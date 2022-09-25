@@ -12,7 +12,7 @@ import Comment from '/public/comment.svg';
 import Share from '/public/share.svg';
 import Image from 'next/image';
 import { Category, Emotion } from 'others/IntegrateInterfaces';
-import { colorByCategory, getDayOfWeek } from 'constants/default';
+import { colorByCategory, convertToHttps, getDayOfWeek } from 'constants/default';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { accessTokenAtom, closeAtom, detailAtom, isReadyAtom } from 'others/stateStore';
 import { useEffect, useState } from 'react';
@@ -89,7 +89,7 @@ const Complain: React.FC<ComplainProps> = ({
       <div className={'header'}>
         <div className={'profile'}>
           <div className={'img'}>
-            <img src={writerImg} />
+            <img src={convertToHttps(writerImg)} />
           </div>
           <div className={'texts'}>
             <h3>{writerName}</h3>
@@ -225,7 +225,7 @@ const StyledComplain = styled.div`
       & .img {
         width: 40px;
         height: 40px;
-        background: #ddd;
+        border: none;
         border-radius: 100%;
         overflow: hidden;
         & > img {

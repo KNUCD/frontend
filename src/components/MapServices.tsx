@@ -242,8 +242,16 @@ const StyledMapServices = styled.div<StyledMapServicesProps>`
   }
 
   @media (max-width: 600px) {
+    & .selectPos,
+    .cancel {
+      bottom: 70px;
+    }
     & .selectPos {
       width: 190px;
+      right: 150px;
+    }
+    & .cancel {
+      right: 15px;
     }
   }
 `;

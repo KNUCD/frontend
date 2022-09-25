@@ -18,7 +18,7 @@ import MainIcon from '/public/mainIcon.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { accessTokenAtom, closeAtom, detailAtom, isReadyAtom } from 'others/stateStore';
 import myAxios from 'others/myAxios';
-import { colorByCategory, getDayOfWeek, loginURL } from 'constants/default';
+import { colorByCategory, convertToHttps, getDayOfWeek, loginURL } from 'constants/default';
 import { Category, Emotion } from 'others/IntegrateInterfaces';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -131,7 +131,7 @@ const ComplainDetail: React.FC = () => {
         <div className={'slide'}>
           <div className={'profile'}>
             <div className={'img'}>
-              <img src={detailData.writerImg} />
+              <img src={convertToHttps(detailData.writerImg)} />
             </div>
             <div className={'texts'}>
               <h3>{detailData.writerName}</h3>

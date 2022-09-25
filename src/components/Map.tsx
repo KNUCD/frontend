@@ -243,6 +243,12 @@ const StyledMap = styled.div<StyledMapProps>`
   width: ${(props) => (props.isWriting ? '100%' : '100vw')};
   height: ${(props) => (props.isWriting ? '250px' : '100vh')};
   transition: 1s;
+
+  @media (max-width: 600px) {
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 export default MyMap;
