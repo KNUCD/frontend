@@ -42,6 +42,12 @@ const ComplainList: React.FC = () => {
     setListData(tempListData);
   };
 
+  const refreshComplainList = () => {
+    const tempListData = { ...listData };
+    tempListData.idx++;
+    setListData(tempListData);
+  };
+
   useEffect(() => {
     const tempData = { ...closeData };
     tempData.isMapPage = true;
@@ -58,7 +64,7 @@ const ComplainList: React.FC = () => {
       <ComplainListHeader category={listData.category}>
         <div className={'upper'}>
           <p>민원 꾸러미</p>
-          <div>
+          <div onClick={refreshComplainList}>
             <Refresh />
           </div>
         </div>

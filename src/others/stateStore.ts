@@ -9,6 +9,17 @@ const geolocationAtom = atom({
   },
 });
 
+// const refreshListAtom = atom({
+//   key: 'refreshList',
+//   default: {
+//     idx: 0,
+//     ha: defaultPos.lng - 1,
+//     qa: defaultPos.lat - 1,
+//     oa: defaultPos.lng + 1,
+//     pa: defaultPos.lat + 1,
+//   },
+// });
+
 const realTimeAtom = atom({
   key: 'realTime',
   default: {
@@ -39,6 +50,7 @@ const detailAtom = atom({
 const listAtom = atom({
   key: 'list',
   default: {
+    idx: 0,
     category: 'ALL',
     ha: defaultPos.lng - 1,
     qa: defaultPos.lat - 1,

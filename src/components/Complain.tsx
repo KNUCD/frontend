@@ -66,8 +66,10 @@ const Complain: React.FC<ComplainProps> = ({
       const res = await myAxios('get', `api/v1/expression/${id}`);
       setEmotionData(res.data.response);
 
-      const myRes = await myAxios('get', `api/v1/expression/${id}/me`, undefined, true, accessToken);
-      setMyEmotion(myRes.data.response);
+      if (accessToken !== '') {
+        const myRes = await myAxios('get', `api/v1/expression/${id}/me`, undefined, true, accessToken);
+        setMyEmotion(myRes.data.response);
+      }
     }
   };
 
@@ -106,9 +108,9 @@ const Complain: React.FC<ComplainProps> = ({
             <p>자세히보기</p>
           </>
         ) : (
-          <h3>{content}</h3>
+          <h3 className={'only'}>{content}</h3>
         )}
-        {file && <Image src={file ?? ''} width="100%" height="100%" layout="responsive" objectFit="contain" />}
+        {file && <img src={file ?? ''} />}
         <div className={'interaction'}>
           <div>
             <div>
@@ -140,7 +142,7 @@ const Complain: React.FC<ComplainProps> = ({
             <div>
               <Heart />
             </div>
-            <p>감정 남기기</p>
+            <p>공감 남기기</p>
           </button>
         )}
         {myEmotion === 'GOOD' && (
@@ -255,6 +257,9 @@ const StyledComplain = styled.div`
     position: relative;
     flex-direction: column;
     width: 100%;
+    & .only {
+      margin-bottom: 22px;
+    }
     & > h3 {
       font-weight: 400;
       font-size: 14px;
@@ -268,6 +273,10 @@ const StyledComplain = styled.div`
       margin-bottom: 22px;
       padding: 0 50px 0 24px;
       cursor: pointer;
+    }
+    & > img {
+      width: 100%;
+      height: auto;
     }
     & .interaction {
       display: flex;

@@ -110,6 +110,19 @@ const MyMap: React.FC<MyMapProps> = ({
   };
 
   useEffect(() => {
+    if (listData.idx === 0) return;
+    const tempListData = { ...listData };
+    const map = mapRef.current;
+    if (!map) return;
+    const bounds = Object(map.getBounds());
+    tempListData.ha = bounds.ha;
+    tempListData.qa = bounds.qa;
+    tempListData.oa = bounds.oa;
+    tempListData.pa = bounds.pa;
+    setListData(tempListData);
+  }, [listData.idx]);
+
+  useEffect(() => {
     window.kakao.maps.load(() => {
       setIsMapLoaded(true);
     });
@@ -158,9 +171,9 @@ const MyMap: React.FC<MyMapProps> = ({
                     {
                       width: '32px',
                       height: '40px',
-                      background: 'url("/cluster.svg")',
+                      background: `url("/${clusterSVGByCategory[listData.category]}.svg")`,
                       paddingTop: '3px',
-                      color: '#fff',
+                      color: `${listData.category === 'ALL' ? '#000' : '#fff'}`,
                       textAlign: 'center',
                       fontWeight: 'bold',
                       lineHeight: '31px',
@@ -203,6 +216,13 @@ const MyMap: React.FC<MyMapProps> = ({
       )}
     </>
   );
+};
+
+const clusterSVGByCategory: Obj<string> = {
+  ALL: 'integrationCluster',
+  LIFE: 'lifeCluster',
+  SECURITY: 'securityCluster',
+  TRAFFIC: 'trafficCluster',
 };
 
 interface StyledMapProps {

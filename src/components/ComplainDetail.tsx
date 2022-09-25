@@ -51,13 +51,13 @@ const ComplainDetail: React.FC = () => {
   const comments = [
     {
       name: '곽나영',
-      img: '',
+      img: '/profile1.png',
       date: '2022-09-01',
       body: '공감합니다. 너무 좋은 해결책이네요',
     },
     {
       name: '최윤석',
-      img: '',
+      img: '/profile2.jpeg',
       date: '2022-09-01',
       body: '저도 공감합니다.',
     },
@@ -76,7 +76,7 @@ const ComplainDetail: React.FC = () => {
     const emotionRes = await myAxios('get', `api/v1/expression/${id}`);
     setEmotionData(emotionRes.data.response);
 
-    if (isReady) {
+    if (isReady && accessToken !== '') {
       const myRes = await myAxios('get', `api/v1/expression/${id}/me`, undefined, true, accessToken);
       setMyEmotion(myRes.data.response);
     }
@@ -139,7 +139,8 @@ const ComplainDetail: React.FC = () => {
             <div className={'title'}>{detailData.title}</div>
             <div className={'body'}>{detailData.content}</div>
             {detailData && detailData.file && (
-              <Image src={detailData.file} width="100%" height="100%" layout="responsive" objectFit="contain" />
+              <img src={detailData.file} />
+              // <Image src={detailData.file} width="100%" height="100%" layout="responsive" objectFit="contain" />
             )}
             <div className={'interaction'}>
               <div>
@@ -168,11 +169,13 @@ const ComplainDetail: React.FC = () => {
           </div>
 
           <div className={'comments'}>
-            {comments.map(({ name, body, date }, index) => {
+            {comments.map(({ name, body, date, img }, index) => {
               return (
                 <Comment key={index}>
                   <div className={'profile'}>
-                    <div className={'img'}></div>
+                    <div className={'img'}>
+                      <img src={img} />
+                    </div>
                     <div className={'texts'}>
                       <h3>{name}</h3>
                       <p>{date}</p>
@@ -215,7 +218,7 @@ const ComplainDetail: React.FC = () => {
                   <div>
                     <Heart />
                   </div>
-                  <p>감정 남기기</p>
+                  <p>공감 남기기</p>
                 </button>
               )}
               {myEmotion === 'GOOD' && (
@@ -341,10 +344,9 @@ const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
     & > div {
       width: 100%;
     }
-    & .img {
+    & > img {
       width: 100%;
-      height: 279px;
-      background: #aaa;
+      height: auto;
     }
     & .title {
       word-break: break-all;
