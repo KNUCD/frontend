@@ -120,6 +120,7 @@ const StyledNav = styled.div`
   }
 
   @media (max-width: 600px) {
+    transform: translateX(-70px);
   }
 `;
 
