@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import Pencil from '/public/pencil.svg';
 import MainIcon from '/public/mainIcon.svg';
 import Burgar from '/public/burgar.svg';
+import Location from '/public/location.svg';
 import char from '../../../public/mainChar.png';
 import Link from 'next/link';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -59,12 +60,12 @@ const HomePage: React.FC = () => {
           지역 주민들과 함께 해결책을 찾아나갈 수 있습니다.
         </p>
         <div>
-          <Link href={accessToken === '' ? '' : '/writing'} passHref>
-            <StyledLink className={'writing'} onClick={accessToken === '' ? handleLogin : handleCloseData}>
+          <Link href={'/map'} passHref>
+            <StyledLink className={'writing'} onClick={handleRedirectToMap}>
               <div>
-                <Pencil fill={'white'} />
+                <Location />
               </div>
-              <p>민원 작성하기</p>
+              <p>지도로 가기</p>
             </StyledLink>
           </Link>
           {accessToken === '' ? (
@@ -72,9 +73,14 @@ const HomePage: React.FC = () => {
               로그인
             </button>
           ) : (
-            <button className={'redirect'} onClick={handleRedirectToMap}>
-              지도로 가기
-            </button>
+            <Link href={accessToken === '' ? '' : '/writing'} passHref>
+              <StyledLink className={'redirect'} onClick={accessToken === '' ? handleLogin : handleCloseData}>
+                <div>
+                  <Pencil fill={'#f5564e'} />
+                </div>
+                <p>민원 작성하기</p>
+              </StyledLink>
+            </Link>
           )}
         </div>
       </div>
@@ -145,6 +151,10 @@ const StyledHomePage = styled(StyledPage)`
         }
       }
       & .redirect {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
         filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.25));
         width: 150px;
         height: 58px;

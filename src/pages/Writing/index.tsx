@@ -381,6 +381,31 @@ const StyledSelectPin = styled.div`
     outline: none;
     border: none;
   }
+
+  @media (max-width: 600px) {
+    left: 0;
+    width: 100%;
+    & > p {
+      padding: 0 20px;
+      font-size: 25px;
+    }
+    & > div {
+      padding: 0 10px;
+      height: 100px;
+      & > button {
+        width: 100px;
+        height: 100%;
+        & > div,
+        > p {
+          transform: scale(0.7);
+        }
+        & > p {
+          font-size: 16px;
+          transform: translateY(-25px);
+        }
+      }
+    }
+  }
 `;
 
 const ConstMarker = styled.div`
@@ -504,8 +529,13 @@ const StyledWritingPage = styled(StyledPage)<StyledWritingPageProps>`
     }
   }
 
-  @media (max-width: 800px) {
-    display: none;
+  @media (max-width: 600px) {
+    & .writing {
+      & > .cancel {
+        top: 12px;
+        right: 10px;
+      }
+    }
   }
 `;
 
