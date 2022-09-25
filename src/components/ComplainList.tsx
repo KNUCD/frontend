@@ -5,6 +5,7 @@ import Magnify from '/public/magnify.svg';
 import Life from '/public/life.svg';
 import Security from '/public/security.svg';
 import Traffic from '/public/traffic.svg';
+import MainIcon from '/public/mainIcon.svg';
 import Back from '/public/back.svg';
 import GoBack from '/public/goBack.svg';
 import GoFront from '/public/goFront.svg';
@@ -14,12 +15,14 @@ import { closeAtom, listAtom } from 'others/stateStore';
 import myAxios from 'others/myAxios';
 import { Category } from 'others/IntegrateInterfaces';
 import { colorByCategory } from 'constants/default';
+import { useRouter } from 'next/router';
 
 const ComplainList: React.FC = () => {
   const [closeData, setCloseData] = useRecoilState(closeAtom);
   const [complains, setComplains] = useState([]);
   const { isClosed } = closeData;
   const [listData, setListData] = useRecoilState(listAtom);
+  const router = useRouter();
 
   const handleClose = () => {
     const tempData = { ...closeData };
@@ -67,7 +70,9 @@ const ComplainList: React.FC = () => {
           <div className={'back'} onClick={handleClose}>
             <Back />
           </div>
-          <p>민원 꾸러미</p>
+          <div className={'mainIcon'} onClick={() => router.push('/')}>
+            <MainIcon />
+          </div>
           <div onClick={refreshComplainList}>
             <Refresh />
           </div>

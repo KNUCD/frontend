@@ -14,6 +14,7 @@ import Option from '/public/option.svg';
 import Heart from '/public/heart.svg';
 import CommentIcon from '/public/comment.svg';
 import Share from '/public/share.svg';
+import MainIcon from '/public/mainIcon.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { accessTokenAtom, closeAtom, detailAtom, isReadyAtom } from 'others/stateStore';
 import myAxios from 'others/myAxios';
@@ -118,7 +119,10 @@ const ComplainDetail: React.FC = () => {
         <div className={'back'} onClick={goBackToList}>
           <Back />
         </div>
-        <div>
+        <div className={'mainIcon'} onClick={() => router.push('/')}>
+          <MainIcon />
+        </div>
+        <div className={'pin'}>
           {detailData && <OptionalPin width={'21px'} height={'25px'} fill={colorByCategory[detailData.category]} />}
         </div>
       </div>
@@ -293,11 +297,18 @@ const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 60px;
       height: 60px;
+    }
+    & .mainIcon {
+      width: none;
+      cursor: pointer;
     }
     & .back {
       cursor: pointer;
+    }
+    & > .back,
+    > .pin {
+      width: 60px;
     }
   }
 
