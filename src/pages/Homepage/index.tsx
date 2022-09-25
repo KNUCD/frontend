@@ -227,23 +227,10 @@ const StyledHomePage = styled(StyledPage)`
       & > p {
         width: 100%;
         word-break: break-all;
-        margin-bottom: 60px;
+        margin-bottom: 30px;
         color: #333;
       }
     }
-
-    /* & .writing {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 60% !important;
-    }
-    & .redirect {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: 40% !important;
-    } */
 
     & .char {
       display: flex;
@@ -251,7 +238,6 @@ const StyledHomePage = styled(StyledPage)`
       margin-bottom: 30px;
       opacity: 0.3;
       margin-top: -100px;
-
       z-index: -1;
     }
   }

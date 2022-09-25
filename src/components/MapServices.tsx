@@ -240,6 +240,12 @@ const StyledMapServices = styled.div<StyledMapServicesProps>`
     font-weight: 700;
     font-size: 20px;
   }
+
+  @media (max-width: 600px) {
+    & .selectPos {
+      width: 190px;
+    }
+  }
 `;
 
 export default MapServices;

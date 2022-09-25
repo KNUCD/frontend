@@ -200,10 +200,6 @@ const WritingPage: React.FC = () => {
           </>
         )}
       </StyledWritingPage>
-
-      <StyledMobilePage>
-        <p>민원 작성은 PC에서 이용해주세요</p>
-      </StyledMobilePage>
     </>
   );
 };
@@ -320,6 +316,7 @@ const StyledPreComplain = styled.div<StyledPreComplainProps>`
       color: #4f4f4f;
     }
   }
+
   @media (max-width: 600px) {
     display: ${(props) => (props.isAgree ? 'none' : '')};
     min-width: inherit;
@@ -337,7 +334,9 @@ const StyledPreComplain = styled.div<StyledPreComplainProps>`
         }
       }
     }
-  }
+    & .fixPosBtn {
+      display: none;
+    }
   }
 `;
 
@@ -556,15 +555,6 @@ const StyledWritingPage = styled(StyledPage)<StyledWritingPageProps>`
         right: 10px;
       }
     }
-  }
-`;
-
-const StyledMobilePage = styled(StyledPage)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  & > p {
-    font-size: 20px;
   }
 `;
 
