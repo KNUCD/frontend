@@ -110,6 +110,19 @@ const MyMap: React.FC<MyMapProps> = ({
   };
 
   useEffect(() => {
+    if (listData.idx === 0) return;
+    const tempListData = { ...listData };
+    const map = mapRef.current;
+    if (!map) return;
+    const bounds = Object(map.getBounds());
+    tempListData.ha = bounds.ha;
+    tempListData.qa = bounds.qa;
+    tempListData.oa = bounds.oa;
+    tempListData.pa = bounds.pa;
+    setListData(tempListData);
+  }, [listData.idx]);
+
+  useEffect(() => {
     window.kakao.maps.load(() => {
       setIsMapLoaded(true);
     });
