@@ -66,7 +66,7 @@ const WritingPage: React.FC = () => {
                 <button className={'cancel'} onClick={() => router.back()}>
                   취소하기
                 </button>
-                <StyledPreComplain choicedPin={choicedPin}>
+                <StyledPreComplain choicedPin={choicedPin} isAgree={isAgree}>
                   <h2>민원 작성하기</h2>
 
                   <div className={'category'}>
@@ -210,6 +210,7 @@ const WritingPage: React.FC = () => {
 
 interface StyledPreComplainProps {
   choicedPin: string;
+  isAgree: boolean;
 }
 
 const StyledPreComplain = styled.div<StyledPreComplainProps>`
@@ -318,6 +319,25 @@ const StyledPreComplain = styled.div<StyledPreComplainProps>`
       font-size: 11px;
       color: #4f4f4f;
     }
+  }
+  @media (max-width: 600px) {
+    display: ${(props) => (props.isAgree ? 'none' : '')};
+    min-width: inherit;
+    width: 100%;
+    & .category {
+      & > button {
+        display: flex;
+        justify-content: center;
+        padding: 0;
+        & > div {
+          width: 40px;
+        }
+        & > p {
+          white-space: nowrap;
+        }
+      }
+    }
+  }
   }
 `;
 
