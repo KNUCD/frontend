@@ -60,7 +60,7 @@ const MyMap: React.FC<MyMapProps> = ({
     const map = mapRef.current;
     if (!map) return;
     const nowLevel = map?.getLevel();
-    if (nowLevel < 6) {
+    if (nowLevel < 5) {
       const bound = Object(cluster.getBounds());
       // ha : 지도 좌측 하단 경도
       // qa : 지도 좌측 하단 위도

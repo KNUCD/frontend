@@ -5,4 +5,8 @@ export const StyledPage = styled.div`
   margin-left: 70px;
   width: calc(100% - 70px);
   height: 100%;
+  @media (max-width: 600px) {
+    margin-left: 0;
+    width: 100%;
+  }
 `;

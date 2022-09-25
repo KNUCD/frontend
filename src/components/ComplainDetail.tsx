@@ -516,6 +516,12 @@ const StyledComplainDetail = styled.div<StyledComplainDetailProps>`
     z-index: 3;
     cursor: pointer;
   }
+
+  @media (max-width: 600px) {
+    width: 100%;
+    min-width: inherit;
+    z-index: 4;
+  }
 `;
 
 const Comment = styled.div`

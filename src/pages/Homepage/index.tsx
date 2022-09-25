@@ -4,11 +4,15 @@ import main from '../../../public/main.png';
 import main2 from '../../../public/main2.png';
 import styled from 'styled-components';
 import Pencil from '/public/pencil.svg';
+import MainIcon from '/public/mainIcon.svg';
+import Burgar from '/public/burgar.svg';
+import char from '../../../public/mainChar.png';
 import Link from 'next/link';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { accessTokenAtom, closeAtom } from 'others/stateStore';
 import { useRouter } from 'next/router';
 import { loginURL } from 'constants/default';
+import Nav from 'components/Nav';
 
 const HomePage: React.FC = () => {
   const [closeData, setCloseData] = useRecoilState(closeAtom);
@@ -31,6 +35,12 @@ const HomePage: React.FC = () => {
 
   return (
     <StyledHomePage>
+      <div className={'mobileHeader'}>
+        <div>
+          <MainIcon />
+        </div>
+        <div>{/* <Burgar /> */}</div>
+      </div>
       <div>
         <h3>A pin for civil complain</h3>
         <h2>
@@ -40,6 +50,9 @@ const HomePage: React.FC = () => {
           <br />
           핀을 찍어 주세요!
         </h2>
+        <div className={'char'}>
+          <Char src={char} />
+        </div>
         <p>
           손쉽고 직관적인 민원 제기 시스템을 통해 지역의 문제를 한눈에 파악하고
           <br />
@@ -79,6 +92,10 @@ const HomePage: React.FC = () => {
 const StyledLink = styled.a``;
 
 const StyledHomePage = styled(StyledPage)`
+  & .mobileHeader {
+    display: none;
+  }
+
   & > div {
     display: flex;
     position: absolute;
@@ -102,6 +119,7 @@ const StyledHomePage = styled(StyledPage)`
       font-size: 16px;
       color: #828282;
       margin-bottom: 70px;
+      padding-right: 20px;
     }
     & > div {
       display: flex;
@@ -148,8 +166,11 @@ const StyledHomePage = styled(StyledPage)`
     height: 100vh;
     z-index: 0;
   }
+  & .char {
+    display: none;
+  }
 
-  @media (min-width: 1500px) {
+  @media (min-width: 1400px) {
     & > div {
       padding: 140px 130px;
     }
@@ -157,7 +178,7 @@ const StyledHomePage = styled(StyledPage)`
       display: none;
     }
   }
-  @media (max-width: 1499px) {
+  @media (max-width: 1399px) {
     & > div {
       padding: 70px 120px;
     }
@@ -165,6 +186,70 @@ const StyledHomePage = styled(StyledPage)`
       display: none;
     }
   }
+  @media (max-width: 600px) {
+    & .mobileHeader {
+      display: flex;
+      flex-direction: row;
+      position: absolute;
+      justify-content: space-between;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      padding: 0 15px;
+      z-index: 2;
+      & > div {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        cursor: pointer;
+      }
+    }
+    & > div {
+      width: 100%;
+      padding: 70px 0 0 20px;
+      & > h3 {
+        font-size: 20px;
+      }
+      & > h2 {
+        font-size: 47px;
+      }
+      & > p {
+        width: 100%;
+        word-break: break-all;
+        margin-bottom: 60px;
+        color: #333;
+      }
+    }
+
+    /* & .writing {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 60% !important;
+    }
+    & .redirect {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 40% !important;
+    } */
+
+    & .char {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      opacity: 0.3;
+      margin-top: -100px;
+
+      z-index: -1;
+    }
+  }
+`;
+
+const Char = styled(Image)`
+  width: 100%;
+  max-width: 300px;
 `;
 
 const Main = styled(Image)`

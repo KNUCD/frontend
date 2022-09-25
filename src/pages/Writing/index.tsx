@@ -202,7 +202,7 @@ const WritingPage: React.FC = () => {
       </StyledWritingPage>
 
       <StyledMobilePage>
-        <p>PC에서 이용해주세요</p>
+        <p>민원 작성은 PC에서 이용해주세요</p>
       </StyledMobilePage>
     </>
   );

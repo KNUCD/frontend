@@ -203,7 +203,7 @@ const StyledComplain = styled.div`
       font-weight: 700;
       font-size: 24px;
       color: #000;
-      white-space: nowrap;
+      word-break: break-all;
     }
   }
 

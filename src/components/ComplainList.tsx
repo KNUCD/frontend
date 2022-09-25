@@ -5,6 +5,7 @@ import Magnify from '/public/magnify.svg';
 import Life from '/public/life.svg';
 import Security from '/public/security.svg';
 import Traffic from '/public/traffic.svg';
+import Back from '/public/back.svg';
 import GoBack from '/public/goBack.svg';
 import GoFront from '/public/goFront.svg';
 import { useEffect, useState } from 'react';
@@ -63,6 +64,9 @@ const ComplainList: React.FC = () => {
     <StyledComplainList isClosed={isClosed}>
       <ComplainListHeader category={listData.category}>
         <div className={'upper'}>
+          <div className={'back'} onClick={handleClose}>
+            <Back />
+          </div>
           <p>민원 꾸러미</p>
           <div onClick={refreshComplainList}>
             <Refresh />
@@ -180,6 +184,20 @@ const StyledComplainList = styled.div<StyledComplainListProps>`
     z-index: -1;
     cursor: pointer;
   }
+
+  & .back {
+    display: none;
+  }
+
+  @media (max-width: 600px) {
+    min-width: inherit;
+    width: 100% !important;
+    z-index: 4;
+    & .back {
+      display: flex;
+      align-items: center;
+    }
+  }
 `;
 
 interface ComplainListHeaderProps {
@@ -290,6 +308,21 @@ const ComplainListHeader = styled.div<ComplainListHeaderProps>`
       border-radius: 3px;
       & > p {
         color: #662d91;
+      }
+    }
+  }
+  @media (max-width: 600px) {
+    & .category {
+      & > button {
+        display: flex;
+        justify-content: center;
+        padding: 0;
+        & > div {
+          width: 40px;
+        }
+        & > p {
+          white-space: nowrap;
+        }
       }
     }
   }
