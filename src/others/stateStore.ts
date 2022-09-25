@@ -35,7 +35,7 @@ const closeAtom = atom({
   key: 'close',
   default: {
     isMapPage: false,
-    isClosed: false,
+    isClosed: true,
     isList: true,
   },
 });
